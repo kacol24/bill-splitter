@@ -11,75 +11,117 @@
             max-width: 540px;
         }
     </style>
+    <!--<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/sort@3.14.6/dist/cdn.min.js"></script>-->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.14.6/dist/cdn.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/sort@3.14.6/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.14.6/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.6/dist/cdn.min.js"></script>
 </head>
 <body data-bs-theme="dark">
 <div class="container">
     <div x-data="BillSplitter">
-        <div class="row g-2 border-bottom mb-2">
-            <div class="col">
-                <h6>Item</h6>
+        <div id="Participants">
+            <h2>Participants</h2>
+            <div class="row g-2 border-bottom mb-2">
+                <div class="col">
+                    <h6>Name</h6>
+                </div>
+                <div class="col">
+                    <h6>Total</h6>
+                </div>
+                <div class="col-1"></div>
             </div>
-            <div class="col">
-                <h6>Total</h6>
-            </div>
-            <div class="col-1"></div>
+            <template x-for="(participant, index) in participants" :key="index">
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col">
+                        <input type="text" class="form-control" aria-label="item name" x-model="participant.name">
+                    </div>
+                    <div class="col text-end">
+                        Rp<span class="p-0" x-text="number_format(participant.sum)">123,456,789</span>
+                    </div>
+                    <div class="col-1">
+                        <template x-if="participants.length > 1">
+                            <button class="btn btn-danger btn-sm"
+                                    @click="removeParticipantRow(index)">
+                                -
+                            </button>
+                        </template>
+                    </div>
+                    <template x-if="participants.length == index + 1">
+                        <div class="col-12">
+                            <button class="btn btn-primary btn-sm w-100"
+                                    @click="addParticipantRow()">
+                                +
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </template>
         </div>
-        <template x-for="(item, index) in items" :key="index">
-            <div class="row g-2 mb-2 align-items-center">
+        <hr>
+        <div id="Bill">
+            <h2>Bill</h2>
+            <div class="row g-2 border-bottom mb-2">
                 <div class="col">
-                    <input type="text" class="form-control" aria-label="item name" x-model="item.name">
+                    <h6>Item</h6>
                 </div>
                 <div class="col">
-                    <div class="input-group">
-                        <span class="input-group-text">Rp</span>
-                        <input type="text" inputmode="numeric" class="form-control text-end" aria-label="subtotal"
-                               @focus="$event.target.select()"
-                               x-model.lazy="item.price"
-                               x-mask:dynamic="$money($input)">
-                    </div>
+                    <h6>Total</h6>
                 </div>
-                <div class="col-1">
-                    <template x-if="items.length > 1">
-                        <button class="btn btn-danger btn-sm"
-                                @click="removeRow(index)">
-                            -
-                        </button>
-                    </template>
-                </div>
-                <template x-if="items.length == index + 1">
-                    <div class="col-12">
-                        <button class="btn btn-primary btn-sm w-100"
-                                @click="addRow()">
-                            +
-                        </button>
-                    </div>
-                </template>
+                <div class="col-1"></div>
             </div>
-        </template>
-        <div class="row g-2 mb-2">
-            <div class="col-11">
-                <table class="text-end ms-auto table table-sm">
-                    <template x-if="subtotal > 0">
-                        <tr>
-                            <td>Subtotal</td>
-                            <td class="text-nowrap">
-                                Rp<span class="p-0" x-text="number_format(subtotal)">123,456,789</span>
-                            </td>
-                        </tr>
+            <template x-for="(item, index) in items" :key="index">
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col">
+                        <input type="text" class="form-control" aria-label="item name" x-model="item.name">
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" inputmode="numeric" class="form-control text-end" aria-label="subtotal"
+                                   @focus="$event.target.select()"
+                                   x-model.lazy="item.price"
+                                   x-mask:dynamic="$money($input)">
+                        </div>
+                    </div>
+                    <div class="col-1">
+                        <template x-if="items.length > 1">
+                            <button class="btn btn-danger btn-sm"
+                                    @click="removeItemRow(index)">
+                                -
+                            </button>
+                        </template>
+                    </div>
+                    <template x-if="items.length == index + 1">
+                        <div class="col-12">
+                            <button class="btn btn-primary btn-sm w-100"
+                                    @click="addItemRow()">
+                                +
+                            </button>
+                        </div>
                     </template>
-                    <template x-if="grandtotal > 0">
-                        <tr>
-                            <td>Grand total</td>
-                            <th class="text-nowrap">
-                                Rp<span class="p-0" x-text="number_format(grandtotal)">123,456,789</span>
-                            </th>
-                        </tr>
-                    </template>
-                </table>
+                </div>
+            </template>
+            <div class="row g-2 mb-2">
+                <div class="col-11">
+                    <table class="text-end ms-auto table table-sm">
+                        <template x-if="subtotal > 0">
+                            <tr>
+                                <td>Subtotal</td>
+                                <td class="text-nowrap">
+                                    Rp<span class="p-0" x-text="number_format(subtotal)">123,456,789</span>
+                                </td>
+                            </tr>
+                        </template>
+                        <template x-if="grandtotal > 0">
+                            <tr>
+                                <td>Grand total</td>
+                                <th class="text-nowrap">
+                                    Rp<span class="p-0" x-text="number_format(grandtotal)">123,456,789</span>
+                                </th>
+                            </tr>
+                        </template>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -90,28 +132,45 @@
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 <script src="js/utils.js"></script>
 <script>
-  document.addEventListener('alpine:init', () => {
-    Alpine.data('BillSplitter', () => ({
-      items: [
-        {
-          price: 0
+  document.addEventListener('alpine:init', function() {
+    Alpine.data('BillSplitter', function() {
+      return {
+        participants: this.$persist([
+          {
+            sum: 0
+          }
+        ]),
+        addParticipantRow() {
+          this.participants.push({
+            sum: 0
+          });
+        },
+        removeParticipantRow(index) {
+          this.participants.splice(index, 1);
+        },
+
+        items: this.$persist([
+          {
+            price: 0
+          }
+        ]),
+        get subtotal() {
+          return _.sumBy(this.items,
+              item => parseInt(item.price.toString().replaceAll(',', '')));
+        },
+        get grandtotal() {
+          return this.subtotal;
+        },
+        addItemRow() {
+          this.items.push({
+            price: 0
+          });
+        },
+        removeItemRow(index) {
+          this.items.splice(index, 1);
         }
-      ],
-      get subtotal() {
-        return _.sumBy(this.items, item => parseInt(item.price.toString().replaceAll(',', '')));
-      },
-      get grandtotal() {
-        return this.subtotal;
-      },
-      addRow() {
-        this.items.push({
-          price: 0
-        });
-      },
-      removeRow(index) {
-        this.items.splice(index, 1);
-      }
-    }));
+      };
+    });
   });
 </script>
 </body>
