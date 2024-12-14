@@ -56,6 +56,20 @@
                     </template>
                 </div>
             </template>
+            <div class="row g-2 mb-2">
+                <div class="col-11">
+                    <table class="text-end ms-auto table table-sm">
+                        <template x-if="sum > 0">
+                            <tr>
+                                <td class="w-50">Sum</td>
+                                <td class="w-50 text-nowrap">
+                                    Rp<span class="p-0" x-text="number_format(sum)">123,456,789</span>
+                                </td>
+                            </tr>
+                        </template>
+                    </table>
+                </div>
+            </div>
         </div>
         <hr>
         <div id="Bill">
@@ -172,9 +186,18 @@
           this.participants.push({
             sum: 0
           });
+          this.calculateSum();
         },
         removeParticipantRow(index) {
+          this.items.forEach(item => {
+            const theParticipant = item.participants.findIndex(participant => participant === index.toString());
+            item.participants.splice(theParticipant, 1);
+          });
           this.participants.splice(index, 1);
+          this.calculateSum();
+        },
+        get sum() {
+          return _.sumBy(this.participants, participant => participant.sum);
         },
 
         items: this.$persist([
