@@ -91,6 +91,18 @@
                             </button>
                         </template>
                     </div>
+                    <div class="col-12">
+                        <template x-for="(participant, index) in participants" :key="index">
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="checkbox"
+                                           x-model="item.participants"
+                                           :value="index" @change="calculateSum">
+                                    <span x-text="participant.name"></span>
+                                </label>
+                            </div>
+                        </template>
+                    </div>
                     <template x-if="items.length == index + 1">
                         <div class="col-12">
                             <button class="btn btn-primary btn-sm w-100"
@@ -135,11 +147,27 @@
   document.addEventListener('alpine:init', function() {
     Alpine.data('BillSplitter', function() {
       return {
+        init() {
+          this.calculateSum();
+        },
         participants: this.$persist([
           {
             sum: 0
           }
         ]),
+        calculateSum() {
+          this.participants.forEach(participant => {
+            participant.sum = 0;
+          });
+          this.items.forEach(item => {
+            const divider = item.participants.length;
+            const price = parseInt(item.price.toString().replaceAll(',', ''));
+            const pricePerParticipant = price / divider;
+            item.participants.forEach(participant => {
+              this.participants[participant].sum += pricePerParticipant;
+            });
+          });
+        },
         addParticipantRow() {
           this.participants.push({
             sum: 0
@@ -151,7 +179,8 @@
 
         items: this.$persist([
           {
-            price: 0
+            price: 0,
+            participants: [],
           }
         ]),
         get subtotal() {
@@ -163,7 +192,8 @@
         },
         addItemRow() {
           this.items.push({
-            price: 0
+            price: 0,
+            participants: [],
           });
         },
         removeItemRow(index) {
