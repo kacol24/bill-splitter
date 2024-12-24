@@ -29,7 +29,7 @@
                     </button>
                 </div>
             </div>
-            <div class="row g-2 border-bottom mb-2">
+            <div class="row gx-2 border-bottom mb-2">
                 <div class="col">
                     <h6>Nama</h6>
                 </div>
@@ -39,7 +39,7 @@
                 <div class="col-1"></div>
             </div>
             <template x-for="(participant, index) in participants" :key="index">
-                <div class="row g-2 mb-2 align-items-center">
+                <div class="row gx-2 mb-2 align-items-center">
                     <div class="col">
                         <input type="text" class="form-control" aria-label="item name" x-model="participant.name">
                     </div>
@@ -55,7 +55,7 @@
                         </template>
                     </div>
                     <template x-if="participants.length == index + 1">
-                        <div class="col-12">
+                        <div class="col-12 mt-3">
                             <button class="btn btn-primary btn-sm w-100"
                                     @click="addParticipantRow()">
                                 +
@@ -64,20 +64,20 @@
                     </template>
                 </div>
             </template>
-            <div class="row g-2 mb-2">
-                <div class="col-11">
-                    <table class="text-end ms-auto table table-sm">
-                        <template x-if="sum > 0">
-                            <tr>
-                                <td class="w-50">Sum</td>
-                                <td class="w-50 text-nowrap">
-                                    Rp<span class="p-0" x-text="number_format(sum)">123,456,789</span>
-                                </td>
-                            </tr>
-                        </template>
-                    </table>
+            <template x-if="sum > 0">
+                <div class="row gx-2 mt-1">
+                    <div class="col-11">
+                        <div class="row gx-3 justify-content-end align-items-center">
+                            <div class="col text-end">
+                                Sum
+                            </div>
+                            <div class="col-5 text-end text-nowrap">
+                                Rp<span class="p-0" x-text="number_format(sum)">123,456,789</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </template>
         </div>
         <hr>
         <div id="Bill">
@@ -90,7 +90,7 @@
                     </button>
                 </div>
             </div>
-            <div class="row g-2 border-bottom mb-2">
+            <div class="row gx-2 border-bottom mb-2">
                 <div class="col">
                     <h6>Item</h6>
                 </div>
@@ -100,7 +100,7 @@
                 <div class="col-1"></div>
             </div>
             <template x-for="(item, index) in items" :key="index">
-                <div class="row g-2 mb-2 align-items-center">
+                <div class="row gx-2 mb-2 align-items-center">
                     <div class="col">
                         <input type="text" class="form-control" aria-label="item name" x-model="item.name">
                     </div>
@@ -121,7 +121,7 @@
                             </button>
                         </template>
                     </div>
-                    <div class="col-12" style="min-height: 26px">
+                    <div class="col-12 mt-1" style="min-height: 26px">
                         <template x-for="(participant, index) in participants" :key="index">
                             <div class="form-check form-check-inline"
                                  x-show="participant.name">
@@ -135,7 +135,7 @@
                         </template>
                     </div>
                     <template x-if="items.length == index + 1">
-                        <div class="col-12">
+                        <div class="col-12 mt-3">
                             <button class="btn btn-primary btn-sm w-100"
                                     @click="addItemRow()">
                                 +
@@ -144,28 +144,34 @@
                     </template>
                 </div>
             </template>
-            <div class="row g-2 mb-2">
-                <div class="col-11">
-                    <table class="text-end ms-auto table table-sm">
-                        <template x-if="subtotal > 0">
-                            <tr>
-                                <td>Subtotal</td>
-                                <td class="text-nowrap">
-                                    Rp<span class="p-0" x-text="number_format(subtotal)">123,456,789</span>
-                                </td>
-                            </tr>
-                        </template>
-                        <template x-if="grandtotal > 0">
-                            <tr>
-                                <td>Grand total</td>
-                                <th class="text-nowrap">
-                                    Rp<span class="p-0" x-text="number_format(grandtotal)">123,456,789</span>
-                                </th>
-                            </tr>
-                        </template>
-                    </table>
+            <template x-if="subtotal > 0">
+                <div class="row gx-2 mb-1">
+                    <div class="col-11">
+                        <div class="row gx-3 justify-content-end align-items-center">
+                            <div class="col text-end">
+                                Subtotal
+                            </div>
+                            <div class="col-5 text-end text-nowrap">
+                                Rp<span class="p-0" x-text="number_format(subtotal)">123,456,789</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </template>
+            <template x-if="grandtotal > 0">
+                <div class="row gx-2 mt-1">
+                    <div class="col-11">
+                        <div class="row gx-3 justify-content-end align-items-center">
+                            <div class="col text-end">
+                                Grand total
+                            </div>
+                            <div class="col-5 text-end text-nowrap fw-bold">
+                                Rp<span class="p-0" x-text="number_format(grandtotal)">123,456,789</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
 </div>
