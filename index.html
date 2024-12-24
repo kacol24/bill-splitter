@@ -22,7 +22,7 @@
         <div id="Participants">
             <div class="d-flex justify-content-between align-items-center">
                 <h2>Anggota</h2>
-                <div x-show="participants.length > 1">
+                <div x-show="participants.length">
                     <button class="btn btn-danger btn-sm"
                             @click.prevent="clearParticipants()">
                         Clear
@@ -41,7 +41,10 @@
             <template x-for="(participant, index) in participants" :key="index">
                 <div class="row gx-2 mb-2 align-items-center">
                     <div class="col">
-                        <input type="text" class="form-control" aria-label="item name" x-model="participant.name">
+                        <input type="text" class="form-control" aria-label="item name"
+                               :x-ref="'participant-' + (index+1)"
+                               @keyup.enter="addParticipantRow()"
+                               x-model="participant.name">
                     </div>
                     <div class="col text-end">
                         Rp<span class="p-0" x-text="number_format(participant.sum)">123,456,789</span>
@@ -54,16 +57,14 @@
                             </button>
                         </template>
                     </div>
-                    <template x-if="participants.length == index + 1">
-                        <div class="col-12 mt-3">
-                            <button class="btn btn-primary btn-sm w-100"
-                                    @click="addParticipantRow()">
-                                +
-                            </button>
-                        </div>
-                    </template>
                 </div>
             </template>
+            <div class="col-12 mt-3">
+                <button class="btn btn-primary btn-sm w-100"
+                        @click="addParticipantRow()">
+                    +
+                </button>
+            </div>
             <template x-if="sum > 0">
                 <div class="row gx-2 mt-1">
                     <div class="col-11">
@@ -79,8 +80,8 @@
                 </div>
             </template>
         </div>
-        <hr>
         <div id="Bill">
+            <hr>
             <div class="d-flex justify-content-between align-items-center">
                 <h2>Bill</h2>
                 <div x-show="items.length > 1">
@@ -102,13 +103,16 @@
             <template x-for="(item, index) in items" :key="index">
                 <div class="row gx-2 mb-2 align-items-center">
                     <div class="col">
-                        <input type="text" class="form-control" aria-label="item name" x-model="item.name">
+                        <input type="text" class="form-control" aria-label="item name"
+                               :x-ref="'item-' + (index+1)"
+                               x-model="item.name">
                     </div>
                     <div class="col">
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
                             <input type="text" inputmode="numeric" class="form-control text-end" aria-label="subtotal"
                                    @focus="$event.target.select()"
+                                   @keyup.enter="addItemRow()"
                                    x-model.lazy="item.price"
                                    x-mask:dynamic="$money($input)">
                         </div>
@@ -209,6 +213,11 @@
           this.participants.push({
             sum: 0
           });
+          let ref = 'participant-' + this.participants.length;
+          this.$nextTick(() => {
+            let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
+            inputEl[0].focus();
+          });
           this.calculateSum();
         },
         removeParticipantRow(index) {
@@ -220,10 +229,11 @@
           this.calculateSum();
         },
         clearParticipants() {
-          this.participants = [
-            {
-              sum: 0
-            }];
+          let confirmed = confirm('Clear anggota? Gak bisa di-undo ya');
+          if (!confirmed) {
+            return;
+          }
+          this.participants = [];
           this.items.forEach(item => {
             item.participants = [];
           });
@@ -251,8 +261,17 @@
             price: 0,
             participants: []
           });
+          let ref = 'item-' + this.items.length;
+          this.$nextTick(() => {
+            let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
+            inputEl[0].focus();
+          });
         },
         clearBill() {
+          let confirmed = confirm('Clear bill? Gak bisa di-undo ya');
+          if (!confirmed) {
+            return;
+          }
           this.items = [
             {
               price: 0,
