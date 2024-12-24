@@ -20,8 +20,11 @@
 <div class="container">
     <div x-data="BillSplitter">
         <div id="Participants">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>Anggota</h2>
+            <div class="d-flex justify-content-between align-items-center sticky-top bg-dark">
+                <h2>
+                    Anggota
+                    (<span x-text="participants.length">1</span>)
+                </h2>
                 <div x-show="participants.length">
                     <button class="btn btn-danger btn-sm"
                             @click.prevent="clearParticipants()">
@@ -38,52 +41,62 @@
                 </div>
                 <div class="col-1"></div>
             </div>
-            <template x-for="(participant, index) in participants" :key="index">
-                <div class="row gx-2 mb-2 align-items-center">
-                    <div class="col">
-                        <input type="text" class="form-control" aria-label="item name"
-                               :x-ref="'participant-' + (index+1)"
-                               @keyup.enter="addParticipantRow()"
-                               x-model="participant.name">
+            <div class="overflow-y-auto overflow-x-hidden">
+                <template x-for="(participant, index) in participants" :key="index">
+                    <div class="row gx-2 mb-2 align-items-center">
+                        <div class="col-1">
+                            <span x-text="index + 1">1</span>.
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control" aria-label="item name"
+                                   :x-ref="'participant-' + (index+1)"
+                                   @keyup.enter="addParticipantRow()"
+                                   x-model="participant.name">
+                        </div>
+                        <div class="col text-end">
+                            Rp<span class="p-0" x-text="number_format(participant.sum)">123,456,789</span>
+                        </div>
+                        <div class="col-1">
+                            <template x-if="participants.length > 1">
+                                <button class="btn btn-danger btn-sm"
+                                        @click="removeParticipantRow(index)">
+                                    -
+                                </button>
+                            </template>
+                        </div>
                     </div>
-                    <div class="col text-end">
-                        Rp<span class="p-0" x-text="number_format(participant.sum)">123,456,789</span>
-                    </div>
-                    <div class="col-1">
-                        <template x-if="participants.length > 1">
-                            <button class="btn btn-danger btn-sm"
-                                    @click="removeParticipantRow(index)">
-                                -
-                            </button>
-                        </template>
-                    </div>
-                </div>
-            </template>
-            <div class="col-12 mt-3">
-                <button class="btn btn-primary btn-sm w-100"
-                        @click="addParticipantRow()">
-                    +
-                </button>
+                </template>
             </div>
-            <template x-if="sum > 0">
-                <div class="row gx-2 mt-1">
-                    <div class="col-11">
-                        <div class="row gx-3 justify-content-end align-items-center">
-                            <div class="col text-end">
-                                Sum
-                            </div>
-                            <div class="col-5 text-end text-nowrap">
-                                Rp<span class="p-0" x-text="number_format(sum)">123,456,789</span>
+            <div class="sticky-top bottom-0 top-auto bg-dark">
+                <div class="col-12 mt-3">
+                    <button class="btn btn-primary btn-sm w-100"
+                            @click="addParticipantRow()">
+                        +
+                    </button>
+                </div>
+                <div style="min-height: 24px" class="mt-2">
+                    <div class="row gx-2" x-show="sum > 0">
+                        <div class="col-11">
+                            <div class="row gx-3 justify-content-end align-items-center">
+                                <div class="col text-end">
+                                    Sum
+                                </div>
+                                <div class="col-5 text-end text-nowrap">
+                                    Rp<span class="p-0" x-text="number_format(sum)">123,456,789</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </template>
+            </div>
         </div>
         <div id="Bill">
             <hr>
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>Bill</h2>
+            <div class="d-flex justify-content-between align-items-center sticky-top bg-dark">
+                <h2>
+                    Bill
+                    (<span x-text="items.length">1</span>)
+                </h2>
                 <div x-show="items.length > 1">
                     <button class="btn btn-danger btn-sm"
                             @click.prevent="clearBill()">
@@ -102,6 +115,9 @@
             </div>
             <template x-for="(item, index) in items" :key="index">
                 <div class="row gx-2 mb-2 align-items-center">
+                    <div class="col-1">
+                        <span x-text="index + 1">1</span>.
+                    </div>
                     <div class="col">
                         <input type="text" class="form-control" aria-label="item name"
                                :x-ref="'item-' + (index+1)"
@@ -126,56 +142,69 @@
                         </template>
                     </div>
                     <div class="col-12 mt-1" style="min-height: 26px">
-                        <template x-for="(participant, index) in participants" :key="index">
-                            <div class="form-check form-check-inline"
-                                 x-show="participant.name">
-                                <label class="form-check-label">
-                                    <input class="form-check-input" type="checkbox"
-                                           x-model="item.participants"
-                                           :value="index" @change="calculateSum">
-                                    <span x-text="participant.name"></span>
-                                </label>
+                        <div class="row">
+                            <div class="col-1">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox"
+                                               x-model="item.allParticipants"
+                                               @change="toggleParticipants(index, $event.target.checked)">
+                                    </label>
+                                </div>
                             </div>
-                        </template>
-                    </div>
-                    <template x-if="items.length == index + 1">
-                        <div class="col-12 mt-3">
-                            <button class="btn btn-primary btn-sm w-100"
-                                    @click="addItemRow()">
-                                +
-                            </button>
-                        </div>
-                    </template>
-                </div>
-            </template>
-            <template x-if="subtotal > 0">
-                <div class="row gx-2 mb-1">
-                    <div class="col-11">
-                        <div class="row gx-3 justify-content-end align-items-center">
-                            <div class="col text-end">
-                                Subtotal
-                            </div>
-                            <div class="col-5 text-end text-nowrap">
-                                Rp<span class="p-0" x-text="number_format(subtotal)">123,456,789</span>
+                            <div class="col">
+                                <template x-for="(participant, index) in participants" :key="index">
+                                    <div class="form-check form-check-inline">
+                                        <label class="form-check-label">
+                                            <input class="form-check-input" type="checkbox"
+                                                   x-model="item.participants"
+                                                   :value="index" @change="calculateSum">
+<!--                                            <span x-text="index + 1"></span>. -->
+                                            <span x-text="participant.name"></span>
+                                        </label>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>
                 </div>
             </template>
-            <template x-if="grandtotal > 0">
-                <div class="row gx-2 mt-1">
-                    <div class="col-11">
-                        <div class="row gx-3 justify-content-end align-items-center">
-                            <div class="col text-end">
-                                Grand total
-                            </div>
-                            <div class="col-5 text-end text-nowrap fw-bold">
-                                Rp<span class="p-0" x-text="number_format(grandtotal)">123,456,789</span>
+            <div class="sticky-top bottom-0 top-auto bg-dark">
+                <div class="col-12 mt-3">
+                    <button class="btn btn-primary btn-sm w-100"
+                            @click="addItemRow()">
+                        +
+                    </button>
+                </div>
+                <template x-if="subtotal > 0">
+                    <div class="row gx-2 mb-1">
+                        <div class="col-11">
+                            <div class="row gx-3 justify-content-end align-items-center">
+                                <div class="col text-end">
+                                    Subtotal
+                                </div>
+                                <div class="col-5 text-end text-nowrap">
+                                    Rp<span class="p-0" x-text="number_format(subtotal)">123,456,789</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </template>
+                </template>
+                <template x-if="grandtotal > 0">
+                    <div class="row gx-2 mt-1">
+                        <div class="col-11">
+                            <div class="row gx-3 justify-content-end align-items-center">
+                                <div class="col text-end">
+                                    Grand total
+                                </div>
+                                <div class="col-5 text-end text-nowrap fw-bold">
+                                    Rp<span class="p-0" x-text="number_format(grandtotal)">123,456,789</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
 </div>
@@ -203,7 +232,7 @@
           this.items.forEach(item => {
             const divider = item.participants.length;
             const price = parseInt(item.price.toString().replaceAll(',', ''));
-            const pricePerParticipant = price / divider;
+            const pricePerParticipant = Math.ceil(price / divider);
             item.participants.forEach(participant => {
               this.participants[participant].sum += pricePerParticipant;
             });
@@ -266,6 +295,14 @@
             let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
             inputEl[0].focus();
           });
+        },
+        toggleParticipants(index, checked) {
+          if (checked) {
+            this.items[index].participants = [...this.participants.keys()];
+          } else {
+            this.items[index].participants = [];
+          }
+          this.calculateSum();
         },
         clearBill() {
           let confirmed = confirm('Clear bill? Gak bisa di-undo ya');
