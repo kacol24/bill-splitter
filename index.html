@@ -97,7 +97,7 @@
                     Bill
                     (<span x-text="items.length">1</span>)
                 </h2>
-                <div x-show="items.length > 1">
+                <div x-show="items.length">
                     <button class="btn btn-danger btn-sm"
                             @click.prevent="clearBill()">
                         Clear
@@ -177,7 +177,7 @@
                     </button>
                 </div>
                 <template x-if="subtotal > 0">
-                    <div class="row gx-2 mb-1">
+                    <div class="row gx-2 mb-1 mt-2">
                         <div class="col-11">
                             <div class="row gx-3 justify-content-end align-items-center">
                                 <div class="col text-end">
@@ -309,12 +309,7 @@
           if (!confirmed) {
             return;
           }
-          this.items = [
-            {
-              price: 0,
-              participants: []
-            }
-          ];
+          this.items = [];
         },
         removeItemRow(index) {
           this.items.splice(index, 1);
