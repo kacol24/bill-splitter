@@ -214,7 +214,8 @@
                                     <input type="text" inputmode="numeric" class="form-control text-end"
                                            aria-label="subtotal"
                                            @focus="$event.target.select()"
-                                           @change="charge.percent = parseInt(charge.price.toString().replaceAll(',', '')) / subtotal"
+                                           @change="calculateTaxPercent()"
+                                           @blur="calculateTaxPercent()"
                                            @keyup.enter="addChargeRow()"
                                            x-model.lazy="charge.price"
                                            x-mask:dynamic="$money($input)">
@@ -389,6 +390,14 @@
         removeChargeRow(index) {
           this.charges.splice(index, 1);
           this.calculateSum();
+        },
+        calculateTaxPercent() {
+          let subtotal = this.subtotal;
+          this.charges.forEach((charge) => {
+            let price = parseInt(charge.price.toString().replaceAll(',', ''));
+            charge.percent = price / subtotal;
+            subtotal += price;
+          });
         }
       };
     });
