@@ -69,7 +69,7 @@
             </div>
             <div class="sticky-top bottom-0 top-auto bg-dark">
                 <div class="col-12 mt-3">
-                    <button class="btn btn-primary btn-sm w-100"
+                    <button class="btn btn-primary w-100"
                             @click="addParticipantRow()">
                         +
                     </button>
@@ -159,7 +159,7 @@
                                             <input class="form-check-input" type="checkbox"
                                                    x-model="item.participants"
                                                    :value="index" @change="calculateSum">
-<!--                                            <span x-text="index + 1"></span>. -->
+                                            <!--                                            <span x-text="index + 1"></span>. -->
                                             <span x-text="participant.name"></span>
                                         </label>
                                     </div>
@@ -171,7 +171,7 @@
             </template>
             <div class="sticky-top bottom-0 top-auto bg-dark">
                 <div class="col-12 mt-3">
-                    <button class="btn btn-primary btn-sm w-100"
+                    <button class="btn btn-primary w-100"
                             @click="addItemRow()">
                         +
                     </button>
@@ -189,6 +189,47 @@
                             </div>
                         </div>
                     </div>
+                </template>
+                <template x-if="subtotal > 0">
+                    <template x-for="(charge, index) in charges" :key="index">
+                        <div class="row gx-2 mb-2 align-items-center">
+                            <div class="col-1">
+                                <button class="btn btn-primary btn-sm"
+                                        @click="addChargeRow()">
+                                    +
+                                </button>
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control" aria-label="item name"
+                                       placeholder="Cth: service charge, ppn"
+                                       :x-ref="'item-' + (index+1)"
+                                       x-model="charge.name">
+                            </div>
+                            <div class="col-1">
+                                <span x-text="charge.percent * 100">0</span>%
+                            </div>
+                            <div class="col-4">
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" inputmode="numeric" class="form-control text-end"
+                                           aria-label="subtotal"
+                                           @focus="$event.target.select()"
+                                           @change="charge.percent = parseInt(charge.price.toString().replaceAll(',', '')) / subtotal"
+                                           @keyup.enter="addChargeRow()"
+                                           x-model.lazy="charge.price"
+                                           x-mask:dynamic="$money($input)">
+                                </div>
+                            </div>
+                            <div class="col-1">
+                                <template x-if="charges.length > 1">
+                                    <button class="btn btn-danger btn-sm"
+                                            @click="removeChargeRow(index)">
+                                        -
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
                 </template>
                 <template x-if="grandtotal > 0">
                     <div class="row gx-2 mt-1">
@@ -220,6 +261,8 @@
         init() {
           this.calculateSum();
         },
+
+        // participants
         participants: this.$persist([
           {
             sum: 0
@@ -272,6 +315,7 @@
           return _.sumBy(this.participants, participant => participant.sum);
         },
 
+        // items
         items: this.$persist([
           {
             price: 0,
@@ -283,7 +327,9 @@
               item => parseInt(item.price.toString().replaceAll(',', '')));
         },
         get grandtotal() {
-          return this.subtotal;
+          let charges = _.sumBy(this.charges, charge => parseInt(charge.price.toString().replaceAll(',', '')));
+
+          return this.subtotal + charges;
         },
         addItemRow() {
           this.items.push({
@@ -310,9 +356,39 @@
             return;
           }
           this.items = [];
+          this.charges = [
+            {
+              name: '',
+              price: 0,
+              percent: 0
+            }
+          ];
+          this.calculateSum();
         },
         removeItemRow(index) {
           this.items.splice(index, 1);
+        },
+
+        // charges
+        charges: this.$persist([
+          {
+            name: '',
+            price: 0,
+            percent: 0
+          }
+        ]),
+        addChargeRow() {
+          this.charges.push(
+              {
+                name: '',
+                price: 0,
+                percent: 0
+              }
+          );
+        },
+        removeChargeRow(index) {
+          this.charges.splice(index, 1);
+          this.calculateSum();
         }
       };
     });
