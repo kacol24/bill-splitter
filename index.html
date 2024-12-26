@@ -142,9 +142,9 @@
                 </div>
             </div>
         </div>
+        <hr>
         <div id="Bill"
              x-data="ItemList">
-            <hr>
             <div class="d-flex justify-content-between align-items-center sticky-top bg-dark">
                 <h2>
                     Bill
@@ -179,7 +179,8 @@
                     <div class="col">
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input type="text" inputmode="numeric" class="form-control text-end" aria-label="subtotal"
+                            <input type="text" inputmode="numeric" class="form-control text-end"
+                                   aria-label="subtotal"
                                    @focus="$event.target.select()"
                                    @keyup.enter="addItemRow()"
                                    @change="calculateTaxPercent()"
@@ -233,84 +234,84 @@
                     +
                 </button>
             </div>
-            <div class="sticky-top bottom-0 top-auto bg-dark py-1">
-                <template x-if="subtotal > 0">
-                    <div class="row gx-2 mb-1 mt-2">
-                        <div class="col-11">
-                            <div class="row gx-3 justify-content-end align-items-center">
-                                <div class="col text-end">
-                                    Subtotal
-                                </div>
-                                <div class="col-5 text-end text-nowrap">
-                                    Rp<span class="p-0" x-text="number_format(subtotal)">123,456,789</span>
-                                </div>
+        </div>
+        <div class="sticky-top bottom-0 top-auto bg-dark py-1">
+            <template x-if="subtotal > 0">
+                <div class="row gx-2 mb-1 mt-2">
+                    <div class="col-11">
+                        <div class="row gx-3 justify-content-end align-items-center">
+                            <div class="col text-end">
+                                Subtotal
+                            </div>
+                            <div class="col-5 text-end text-nowrap">
+                                Rp<span class="p-0" x-text="number_format(subtotal)">123,456,789</span>
                             </div>
                         </div>
                     </div>
-                </template>
-                <template x-if="subtotal > 0"
-                          x-data="ChargesList">
-                    <template x-for="(charge, index) in charges" :key="index">
-                        <div class="row gx-2 mb-2 align-items-center">
-                            <div class="col-1">
-                                <button class="btn btn-primary btn-sm"
-                                        @click="addChargeRow()">
-                                    +
-                                </button>
-                            </div>
-                            <div class="col">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" aria-label="item name"
-                                           placeholder="Cth: service charge, ppn"
-                                           :x-ref="'item-' + (index+1)"
-                                           @change="calculateTaxPercent()"
-                                           @blur="calculateTaxPercent()"
-                                           x-model="charge.name">
-                                    <span class="input-group-text">
+                </div>
+            </template>
+            <template x-if="subtotal > 0"
+                      x-data="ChargesList">
+                <template x-for="(charge, index) in charges" :key="index">
+                    <div class="row gx-2 mb-2 align-items-center">
+                        <div class="col-1">
+                            <button class="btn btn-primary btn-sm"
+                                    @click="addChargeRow()">
+                                +
+                            </button>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <input type="text" class="form-control" aria-label="item name"
+                                       placeholder="Cth: service charge, ppn"
+                                       :x-ref="'item-' + (index+1)"
+                                       @change="calculateTaxPercent()"
+                                       @blur="calculateTaxPercent()"
+                                       x-model="charge.name">
+                                <span class="input-group-text">
                                         <span x-text="Math.round(charge.percent * 1000) / 10">0</span>%
                                     </span>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" inputmode="numeric" class="form-control text-end"
-                                           aria-label="subtotal"
-                                           @focus="$event.target.select()"
-                                           @change="calculateTaxPercent()"
-                                           @blur="calculateTaxPercent()"
-                                           @keyup.enter="addChargeRow()"
-                                           x-model.lazy="charge.price"
-                                           x-mask:dynamic="$money($input)">
-                                </div>
-                            </div>
-                            <div class="col-1">
-                                <template x-if="charges.length > 1">
-                                    <button class="btn btn-danger btn-sm"
-                                            @click="removeChargeRow(index)">
-                                        -
-                                    </button>
-                                </template>
                             </div>
                         </div>
-                    </template>
-                </template>
-                <template x-if="grandtotal > 0">
-                    <div class="row gx-2 mt-1">
-                        <div class="col-11">
-                            <div class="row gx-3 justify-content-end align-items-center"
-                                 :class="{'text-success': sum >= grandtotal}">
-                                <div class="col text-end">
-                                    Grand total
-                                </div>
-                                <div class="col-5 text-end text-nowrap fw-bold">
-                                    Rp<span class="p-0" x-text="number_format(grandtotal)">123,456,789</span>
-                                </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" inputmode="numeric" class="form-control text-end"
+                                       aria-label="subtotal"
+                                       @focus="$event.target.select()"
+                                       @change="calculateTaxPercent()"
+                                       @blur="calculateTaxPercent()"
+                                       @keyup.enter="addChargeRow()"
+                                       x-model.lazy="charge.price"
+                                       x-mask:dynamic="$money($input)">
                             </div>
+                        </div>
+                        <div class="col-1">
+                            <template x-if="charges.length > 1">
+                                <button class="btn btn-danger btn-sm"
+                                        @click="removeChargeRow(index)">
+                                    -
+                                </button>
+                            </template>
                         </div>
                     </div>
                 </template>
-            </div>
+            </template>
+            <template x-if="grandtotal > 0">
+                <div class="row gx-2 mt-1">
+                    <div class="col-11">
+                        <div class="row gx-3 justify-content-end align-items-center"
+                             :class="{'text-success': sum >= grandtotal}">
+                            <div class="col text-end">
+                                Grand total
+                            </div>
+                            <div class="col-5 text-end text-nowrap fw-bold">
+                                Rp<span class="p-0" x-text="number_format(grandtotal)">123,456,789</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
 </div>
