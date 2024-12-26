@@ -206,7 +206,7 @@
                                                 <label class="form-check-label">
                                                     <input class="form-check-input" type="checkbox"
                                                            x-model="item.participants"
-                                                           :value="index" @change="calculateSum">
+                                                           :value="participant.id" @change="calculateSum">
                                                     <span x-text="participant.name"></span>
                                                 </label>
                                             </div>
@@ -318,11 +318,7 @@
         },
 
         // participants
-        participants: this.$persist([
-          {
-            sum: 0
-          }
-        ]),
+        participants: this.$persist([]),
         calculateSum() {
           this.participants.forEach(participant => {
             participant.sum = 0;
@@ -333,7 +329,8 @@
             const divider = item.participants.length;
             const price = parseInt(item.price.toString().replaceAll(',', ''));
             const pricePerParticipant = price / divider;
-            item.participants.forEach(participantIndex => {
+            item.participants.forEach(participantId => {
+              const participantIndex = item.participants.findIndex(participant => participant == participantId);
               if (!this.participants[participantIndex]) {
                 return;
               }
@@ -363,6 +360,7 @@
         },
         addParticipantRow() {
           this.participants.push({
+            id: this.participants.length.toString() + Date.now(),
             sum: 0
           });
           let ref = 'participant-' + this.participants.length;
@@ -378,11 +376,11 @@
             return;
           }
 
+          let deleted = this.participants.splice(index, 1);
           this.items.forEach(item => {
-            const theParticipant = item.participants.findIndex(participant => participant === index.toString());
+            const theParticipant = item.participants.findIndex(participant => participant == deleted.id);
             item.participants.splice(theParticipant, 1);
           });
-          this.participants.splice(index, 1);
           this.calculateSum();
         },
         clearParticipants() {
@@ -430,7 +428,7 @@
         },
         toggleParticipants(index, checked) {
           if (checked) {
-            this.items[index].participants = [...this.participants.keys()];
+            this.items[index].participants = _.map(this.participants, 'id');
           } else {
             this.items[index].participants = [];
           }
