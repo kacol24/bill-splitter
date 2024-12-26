@@ -77,7 +77,8 @@
                 <div style="min-height: 24px" class="mt-2">
                     <div class="row gx-2" x-show="sum > 0">
                         <div class="col-11">
-                            <div class="row gx-3 justify-content-end align-items-center">
+                            <div class="row gx-3 justify-content-end align-items-center"
+                                 :class="{'text-success': sum >= grandtotal}">
                                 <div class="col text-end">
                                     Sum
                                 </div>
@@ -235,7 +236,8 @@
                 <template x-if="grandtotal > 0">
                     <div class="row gx-2 mt-1">
                         <div class="col-11">
-                            <div class="row gx-3 justify-content-end align-items-center">
+                            <div class="row gx-3 justify-content-end align-items-center"
+                                 :class="{'text-success': sum >= grandtotal}">
                                 <div class="col text-end">
                                     Grand total
                                 </div>
@@ -272,6 +274,7 @@
         calculateSum() {
           this.participants.forEach(participant => {
             participant.sum = 0;
+            participant.details = [];
           });
           this.items.forEach(item => {
             const divider = item.participants.length;
@@ -279,6 +282,20 @@
             const pricePerParticipant = Math.ceil(price / divider);
             item.participants.forEach(participant => {
               this.participants[participant].sum += pricePerParticipant;
+            });
+          });
+          this.participants.forEach(participant => {
+            participant.details.push({
+              'key': 'Subtotal',
+              'value': participant.sum
+            });
+            this.charges.forEach(charge => {
+              let extra = Math.ceil(participant.sum * charge.percent);
+              participant.details.push({
+                'key': charge.name,
+                'value': extra
+              });
+              participant.sum += extra;
             });
           });
         },
