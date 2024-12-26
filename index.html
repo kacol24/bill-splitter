@@ -372,6 +372,11 @@
           this.calculateSum();
         },
         removeParticipantRow(index) {
+          let confirmed = confirm('Remove anggota? Gak bisa di-undo ya');
+          if (!confirmed) {
+            return;
+          }
+
           this.items.forEach(item => {
             const theParticipant = item.participants.findIndex(participant => participant === index.toString());
             item.participants.splice(theParticipant, 1);
@@ -446,6 +451,10 @@
           this.calculateSum();
         },
         removeItemRow(index) {
+          let confirmed = confirm('Remove item? Gak bisa di-undo ya');
+          if (!confirmed) {
+            return;
+          }
           this.items.splice(index, 1);
         },
 
