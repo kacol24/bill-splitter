@@ -42,7 +42,7 @@
                 <div class="col-1"></div>
             </div>
             <div class="overflow-y-auto overflow-x-hidden">
-                <template x-for="(participant, index) in participants" :key="index">
+                <template x-for="(participant, index) in participants" :key="participant.id">
                     <div class="row gx-2 mb-2 align-items-center"
                          x-id="['collapse-participant']">
                         <div class="col-1">
@@ -200,7 +200,7 @@
                             </div>
                             <div class="col">
                                 <div class="row gx-2">
-                                    <template x-for="(participant, index) in participants" :key="index">
+                                    <template x-for="(participant, index) in participants" :key="participant.id">
                                         <div class="col-3">
                                             <div class="form-check form-check-inline">
                                                 <label class="form-check-label">
@@ -331,9 +331,6 @@
             const pricePerParticipant = price / divider;
             item.participants.forEach(participantId => {
               const participantIndex = item.participants.findIndex(participant => participant == participantId);
-              if (!this.participants[participantIndex]) {
-                return;
-              }
               this.participants[participantIndex].items.push({
                 'name': item.name,
                 'price': pricePerParticipant,
