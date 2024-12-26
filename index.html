@@ -257,7 +257,7 @@
                                            @blur="calculateTaxPercent()"
                                            x-model="charge.name">
                                     <span class="input-group-text">
-                                        <span x-text="number_format(charge.percent * 100)">0</span>%
+                                        <span x-text="number_format(charge.percent * 100, 1)">0</span>%
                                     </span>
                                 </div>
                             </div>
@@ -350,7 +350,7 @@
             this.charges.forEach(charge => {
               let extra = participant.sum * charge.percent;
               participant.breakdown.push({
-                'key': charge.name + ' (' + number_format(charge.percent * 100) + '%)',
+                'key': charge.name + ' (' + number_format(charge.percent * 100, 1) + '%)',
                 'value': extra
               });
               participant.sum += extra;
