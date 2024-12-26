@@ -18,7 +18,15 @@
 </head>
 <body data-bs-theme="dark">
 <div class="container">
-    <div x-data="BillSplitter">
+    <div
+            x-data="BillSplitter"
+            @item-removed.window="calculateTaxPercent()"
+            @participant-added.window="calculateSum()"
+            @participant-removed.window="calculateSum()"
+            @participant-cleared.windows="calculateSum()"
+            @participant-toggled.window="calculateSum()"
+            @bill-cleared.window="calculateSum()"
+            @charge-removed="calculateSum()">
         <div id="Participants">
             <div class="d-flex justify-content-between align-items-center sticky-top bg-dark">
                 <h2>
@@ -365,7 +373,8 @@
             let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
             inputEl[0].focus();
           });
-          this.calculateSum();
+          // this.calculateSum();
+          this.$dispatch('participant-added');
         },
         removeParticipantRow(index) {
           let confirmed = confirm('Remove anggota? Gak bisa di-undo ya');
@@ -381,7 +390,8 @@
             }
             item.participants.splice(theParticipant, 1);
           });
-          this.calculateSum();
+          // this.calculateSum();
+          this.$dispatch('participant-removed');
         },
         clearParticipants() {
           let confirmed = confirm('Clear anggota? Gak bisa di-undo ya');
@@ -393,7 +403,8 @@
             item.participants = [];
             item.allParticipants = false;
           });
-          this.calculateSum();
+          // this.calculateSum();
+          this.$dispatch('participant-cleared');
         },
         get sum() {
           return _.sumBy(this.participants, participant => participant.sum);
@@ -407,8 +418,7 @@
           }
         ]),
         get subtotal() {
-          return _.sumBy(this.items,
-              item => parseInt(item.price.toString().replaceAll(',', '')));
+          return _.sumBy(this.items, item => parseInt(item.price.toString().replaceAll(',', '')));
         },
         get grandtotal() {
           let charges = _.sumBy(this.charges, charge => parseInt(charge.price.toString().replaceAll(',', '')));
@@ -425,6 +435,7 @@
             let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
             inputEl[0].focus();
           });
+          this.$dispatch('item-added');
         },
         toggleParticipants(index, checked) {
           if (checked) {
@@ -432,7 +443,8 @@
           } else {
             this.items[index].participants = [];
           }
-          this.calculateSum();
+          // this.calculateSum();
+          this.$dispatch('participant-toggled');
         },
         clearBill() {
           let confirmed = confirm('Clear bill? Gak bisa di-undo ya');
@@ -441,7 +453,8 @@
           }
           this.items = [];
           this.charges = [];
-          this.calculateSum();
+          // this.calculateSum();
+          this.$dispatch('bill-cleared');
           this.charges = [
             {
               name: '',
@@ -456,8 +469,9 @@
             return;
           }
           this.items.splice(index, 1);
-          this.calculateSum();
-          this.calculateTaxPercent();
+          // this.calculateSum();
+          // this.calculateTaxPercent();
+          this.$dispatch('item-removed');
         },
 
         // charges
@@ -479,7 +493,8 @@
         },
         removeChargeRow(index) {
           this.charges.splice(index, 1);
-          this.calculateSum();
+          // this.calculateSum();
+          this.$dispatch('charge-removed');
         },
         calculateTaxPercent() {
           this.calculateSum();
