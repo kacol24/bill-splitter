@@ -43,7 +43,8 @@
             </div>
             <div class="overflow-y-auto overflow-x-hidden">
                 <template x-for="(participant, index) in participants" :key="index">
-                    <div class="row gx-2 mb-2 align-items-center">
+                    <div class="row gx-2 mb-2 align-items-center"
+                         x-id="['collapse-participant']">
                         <div class="col-1">
                             <span x-text="index + 1">1</span>.
                         </div>
@@ -54,7 +55,10 @@
                                    x-model="participant.name">
                         </div>
                         <div class="col text-end">
-                            Rp<span class="p-0" x-text="number_format(participant.sum)">123,456,789</span>
+                            <a data-bs-toggle="collapse"
+                               :href="'#' + $id('collapse-participant')">
+                                Rp<span class="p-0" x-text="number_format(participant.sum)">123,456,789</span>
+                            </a>
                         </div>
                         <div class="col-1">
                             <template x-if="participants.length > 1">
@@ -63,6 +67,23 @@
                                     -
                                 </button>
                             </template>
+                        </div>
+                        <div class="col-11">
+                            <div class="collapse" :id="$id('collapse-participant')">
+                                <table class="ms-auto text-end">
+                                    <template x-for="(detail, index) in participant.breakdown" :key="index">
+                                        <tr>
+                                            <td>
+                                                <span x-text="detail.key"></span> :
+                                            </td>
+                                            <td>
+                                                Rp<span class="p-0"
+                                                        x-text="number_format(detail.value)">123,456,789</span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -204,6 +225,8 @@
                                 <input type="text" class="form-control" aria-label="item name"
                                        placeholder="Cth: service charge, ppn"
                                        :x-ref="'item-' + (index+1)"
+                                       @change="calculateTaxPercent()"
+                                       @blur="calculateTaxPercent()"
                                        x-model="charge.name">
                             </div>
                             <div class="col-1">
@@ -274,29 +297,36 @@
         calculateSum() {
           this.participants.forEach(participant => {
             participant.sum = 0;
-            participant.details = [];
+            participant.items = [];
+            participant.breakdown = [];
           });
           this.items.forEach(item => {
             const divider = item.participants.length;
             const price = parseInt(item.price.toString().replaceAll(',', ''));
             const pricePerParticipant = Math.ceil(price / divider);
-            item.participants.forEach(participant => {
-              this.participants[participant].sum += pricePerParticipant;
+            item.participants.forEach(participantIndex => {
+              this.participants[participantIndex].items.push({
+                'name': item.name,
+                'price': pricePerParticipant,
+                'split': '1/' + divider
+              });
+              this.participants[participantIndex].sum += pricePerParticipant;
             });
           });
           this.participants.forEach(participant => {
-            participant.details.push({
+            participant.breakdown.push({
               'key': 'Subtotal',
               'value': participant.sum
             });
             this.charges.forEach(charge => {
-              let extra = Math.ceil(participant.sum * charge.percent);
-              participant.details.push({
+              let extra = participant.sum * charge.percent;
+              participant.breakdown.push({
                 'key': charge.name,
                 'value': extra
               });
               participant.sum += extra;
             });
+            participant.sum = Math.ceil(participant.sum);
           });
         },
         addParticipantRow() {
