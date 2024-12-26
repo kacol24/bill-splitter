@@ -92,15 +92,14 @@
                                         </tbody>
                                         <tfoot>
                                         <template x-for="(detail, index) in participant.breakdown" :key="index">
-                                            <tr>
+                                            <tr x-show="detail.value > 0 || detail.key == 'Subtotal'">
                                                 <td></td>
                                                 <td class=" text-end">
                                                     <span class="p-0" x-text="detail.key"></span>
                                                 </td>
                                                 <td class=" text-end">
-                                                    Rp<span class="p-0" x-text="number_format(detail.value)">
-                                                123,456,789
-                                            </span>
+                                                    Rp<span class="p-0"
+                                                            x-text="number_format(detail.value)">123,456,789</span>
                                                 </td>
                                             </tr>
                                         </template>
@@ -259,7 +258,7 @@
                                            @blur="calculateTaxPercent()"
                                            x-model="charge.name">
                                     <span class="input-group-text">
-                                        <span x-text="charge.percent * 100">0</span>%
+                                        <span x-text="number_format(charge.percent * 100)">0</span>%
                                     </span>
                                 </div>
                             </div>
@@ -352,7 +351,7 @@
             this.charges.forEach(charge => {
               let extra = participant.sum * charge.percent;
               participant.breakdown.push({
-                'key': charge.name + ' (' + charge.percent * 100 + '%)',
+                'key': charge.name + ' (' + number_format(charge.percent * 100) + '%)',
                 'value': extra
               });
               participant.sum += extra;
@@ -441,6 +440,8 @@
             return;
           }
           this.items = [];
+          this.charges = [];
+          this.calculateSum();
           this.charges = [
             {
               name: '',
@@ -448,7 +449,6 @@
               percent: 0
             }
           ];
-          this.calculateSum();
         },
         removeItemRow(index) {
           let confirmed = confirm('Remove item? Gak bisa di-undo ya');
