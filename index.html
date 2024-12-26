@@ -69,20 +69,44 @@
                             </template>
                         </div>
                         <div class="col-11">
-                            <div class="collapse" :id="$id('collapse-participant')">
-                                <table class="ms-auto text-end">
-                                    <template x-for="(detail, index) in participant.breakdown" :key="index">
-                                        <tr>
-                                            <td>
-                                                <span x-text="detail.key"></span> :
-                                            </td>
-                                            <td>
-                                                Rp<span class="p-0"
-                                                        x-text="number_format(detail.value)">123,456,789</span>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </table>
+                            <div class="collapse"
+                                 :id="$id('collapse-participant')">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-sm mb-0 w-100 text-nowrap mt-1 mb-2">
+                                        <tbody>
+                                        <template x-for="(item, index) in participant.items" :key="index">
+                                            <tr>
+                                                <td class="text-end">
+                                                    <span x-text="index + 1"></span>.
+                                                </td>
+                                                <td>
+                                                    <span class="p-0" x-text="item.name"></span>
+                                                    (<span class="p-0" x-text="item.split"></span>)
+                                                </td>
+                                                <td class="text-end">
+                                                    Rp<span class="p-0"
+                                                            x-text="number_format(item.price)">123,456,789</span>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        </tbody>
+                                        <tfoot>
+                                        <template x-for="(detail, index) in participant.breakdown" :key="index">
+                                            <tr>
+                                                <td></td>
+                                                <td class=" text-end">
+                                                    <span class="p-0" x-text="detail.key"></span>
+                                                </td>
+                                                <td class=" text-end">
+                                                    Rp<span class="p-0" x-text="number_format(detail.value)">
+                                                123,456,789
+                                            </span>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -191,13 +215,13 @@
                     </div>
                 </div>
             </template>
-            <div class="sticky-top bottom-0 top-auto bg-dark">
-                <div class="col-12 mt-3">
-                    <button class="btn btn-primary w-100"
-                            @click="addItemRow()">
-                        +
-                    </button>
-                </div>
+            <div class="col-12 mt-3">
+                <button class="btn btn-primary w-100"
+                        @click="addItemRow()">
+                    +
+                </button>
+            </div>
+            <div class="sticky-top bottom-0 top-auto bg-dark py-1">
                 <template x-if="subtotal > 0">
                     <div class="row gx-2 mb-1 mt-2">
                         <div class="col-11">
@@ -229,10 +253,10 @@
                                        @blur="calculateTaxPercent()"
                                        x-model="charge.name">
                             </div>
-                            <div class="col-1">
+                            <div class="col-2 col-md-1 text-end">
                                 <span x-text="charge.percent * 100">0</span>%
                             </div>
-                            <div class="col-4">
+                            <div class="col-5 col-md-4">
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" inputmode="numeric" class="form-control text-end"
@@ -321,7 +345,7 @@
             this.charges.forEach(charge => {
               let extra = participant.sum * charge.percent;
               participant.breakdown.push({
-                'key': charge.name,
+                'key': charge.name + ' (' + charge.percent * 100 + '%)',
                 'value': extra
               });
               participant.sum += extra;
@@ -356,6 +380,7 @@
           this.participants = [];
           this.items.forEach(item => {
             item.participants = [];
+            item.allParticipants = false;
           });
           this.calculateSum();
         },
