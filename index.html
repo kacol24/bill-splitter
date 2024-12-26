@@ -334,6 +334,9 @@
             const price = parseInt(item.price.toString().replaceAll(',', ''));
             const pricePerParticipant = price / divider;
             item.participants.forEach(participantIndex => {
+              if (!this.participants[participantIndex]) {
+                return;
+              }
               this.participants[participantIndex].items.push({
                 'name': item.name,
                 'price': pricePerParticipant,
