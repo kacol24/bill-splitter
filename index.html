@@ -453,6 +453,8 @@
             return;
           }
           this.items.splice(index, 1);
+          this.calculateSum();
+          this.calculateTaxPercent();
         },
 
         // charges
