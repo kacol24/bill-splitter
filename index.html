@@ -187,8 +187,8 @@
                             </button>
                         </template>
                     </div>
-                    <div class="col-12 mt-1" style="min-height: 26px">
-                        <div class="row">
+                    <div class="col-11 mt-1" style="min-height: 26px">
+                        <div class="row gx-2">
                             <div class="col-1">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label">
@@ -199,17 +199,21 @@
                                 </div>
                             </div>
                             <div class="col">
-                                <template x-for="(participant, index) in participants" :key="index">
-                                    <div class="form-check form-check-inline">
-                                        <label class="form-check-label">
-                                            <input class="form-check-input" type="checkbox"
-                                                   x-model="item.participants"
-                                                   :value="index" @change="calculateSum">
-                                            <!--                                            <span x-text="index + 1"></span>. -->
-                                            <span x-text="participant.name"></span>
-                                        </label>
-                                    </div>
-                                </template>
+                                <div class="row gx-2">
+                                    <template x-for="(participant, index) in participants" :key="index">
+                                        <div class="col-3">
+                                            <div class="form-check form-check-inline">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox"
+                                                           x-model="item.participants"
+                                                           :value="index" @change="calculateSum">
+                                                    <!--                                            <span x-text="index + 1"></span>. -->
+                                                    <span x-text="participant.name"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     </div>
