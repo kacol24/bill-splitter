@@ -376,6 +376,9 @@
           let deleted = this.participants.splice(index, 1);
           this.items.forEach(item => {
             const theParticipant = item.participants.findIndex(participant => participant == deleted[0].id);
+            if (theParticipant < 0) {
+              return;
+            }
             item.participants.splice(theParticipant, 1);
           });
           this.calculateSum();
