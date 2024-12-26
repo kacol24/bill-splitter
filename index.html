@@ -76,10 +76,10 @@
                                         <tbody>
                                         <template x-for="(item, index) in participant.items" :key="index">
                                             <tr>
-                                                <td class="text-end">
+                                                <td class="text-end" style="width: 8.333%;">
                                                     <span x-text="index + 1"></span>.
                                                 </td>
-                                                <td>
+                                                <td style="width: 61.66666667%">
                                                     <span class="p-0" x-text="item.name"></span>
                                                     (<span class="p-0" x-text="item.split"></span>)
                                                 </td>
@@ -175,6 +175,8 @@
                             <input type="text" inputmode="numeric" class="form-control text-end" aria-label="subtotal"
                                    @focus="$event.target.select()"
                                    @keyup.enter="addItemRow()"
+                                   @change="calculateTaxPercent()"
+                                   @blur="calculateTaxPercent()"
                                    x-model.lazy="item.price"
                                    x-mask:dynamic="$money($input)">
                         </div>
@@ -207,7 +209,6 @@
                                                     <input class="form-check-input" type="checkbox"
                                                            x-model="item.participants"
                                                            :value="index" @change="calculateSum">
-                                                    <!--                                            <span x-text="index + 1"></span>. -->
                                                     <span x-text="participant.name"></span>
                                                 </label>
                                             </div>
@@ -333,7 +334,7 @@
           this.items.forEach(item => {
             const divider = item.participants.length;
             const price = parseInt(item.price.toString().replaceAll(',', ''));
-            const pricePerParticipant = Math.ceil(price / divider);
+            const pricePerParticipant = price / divider;
             item.participants.forEach(participantIndex => {
               this.participants[participantIndex].items.push({
                 'name': item.name,
@@ -470,6 +471,7 @@
           this.calculateSum();
         },
         calculateTaxPercent() {
+          this.calculateSum();
           let subtotal = this.subtotal;
           this.charges.forEach((charge) => {
             let price = parseInt(charge.price.toString().replaceAll(',', ''));
