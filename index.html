@@ -18,16 +18,16 @@
 </head>
 <body data-bs-theme="dark">
 <div class="container">
-    <div
-            x-data="BillSplitter"
-            @item-removed.window="calculateTaxPercent()"
-            @participant-added.window="calculateSum()"
-            @participant-removed.window="calculateSum()"
-            @participant-cleared.windows="calculateSum()"
-            @participant-toggled.window="calculateSum()"
-            @bill-cleared.window="calculateSum()"
-            @charge-removed="calculateSum()">
-        <div id="Participants">
+    <div x-data="BillSplitter"
+         @item-removed.window="calculateTaxPercent()"
+         @participant-added.window="calculateSum()"
+         @participant-removed.window="calculateSum()"
+         @participant-cleared.windows="calculateSum()"
+         @participant-toggled.window="calculateSum()"
+         @bill-cleared.window="calculateSum()"
+         @charge-removed="calculateSum()">
+        <div id="Participants"
+             x-data="ParticipantList">
             <div class="d-flex justify-content-between align-items-center sticky-top bg-dark">
                 <h2>
                     Anggota
@@ -142,7 +142,8 @@
                 </div>
             </div>
         </div>
-        <div id="Bill">
+        <div id="Bill"
+             x-data="ItemList">
             <hr>
             <div class="d-flex justify-content-between align-items-center sticky-top bg-dark">
                 <h2>
@@ -247,7 +248,8 @@
                         </div>
                     </div>
                 </template>
-                <template x-if="subtotal > 0">
+                <template x-if="subtotal > 0"
+                          x-data="ChargesList">
                     <template x-for="(charge, index) in charges" :key="index">
                         <div class="row gx-2 mb-2 align-items-center">
                             <div class="col-1">
@@ -363,6 +365,48 @@
             participant.sum = Math.ceil(participant.sum);
           });
         },
+        get sum() {
+          return _.sumBy(this.participants, participant => participant.sum);
+        },
+
+        // items
+        items: this.$persist([
+          {
+            price: 0,
+            participants: []
+          }
+        ]),
+        get subtotal() {
+          return _.sumBy(this.items, item => parseInt(item.price.toString().replaceAll(',', '')));
+        },
+        get grandtotal() {
+          let charges = _.sumBy(this.charges, charge => parseInt(charge.price.toString().replaceAll(',', '')));
+
+          return this.subtotal + charges;
+        },
+
+        // charges
+        charges: this.$persist([
+          {
+            name: '',
+            price: 0,
+            percent: 0
+          }
+        ]),
+        calculateTaxPercent() {
+          this.calculateSum();
+          let subtotal = this.subtotal;
+          this.charges.forEach((charge) => {
+            let price = parseInt(charge.price.toString().replaceAll(',', ''));
+            charge.percent = price / subtotal;
+            subtotal += price;
+          });
+        }
+      };
+    });
+
+    Alpine.data('ParticipantList', function() {
+      return {
         addParticipantRow() {
           this.participants.push({
             id: this.participants.length.toString() + Date.now(),
@@ -406,25 +450,11 @@
           // this.calculateSum();
           this.$dispatch('participant-cleared');
         },
-        get sum() {
-          return _.sumBy(this.participants, participant => participant.sum);
-        },
+      };
+    });
 
-        // items
-        items: this.$persist([
-          {
-            price: 0,
-            participants: []
-          }
-        ]),
-        get subtotal() {
-          return _.sumBy(this.items, item => parseInt(item.price.toString().replaceAll(',', '')));
-        },
-        get grandtotal() {
-          let charges = _.sumBy(this.charges, charge => parseInt(charge.price.toString().replaceAll(',', '')));
-
-          return this.subtotal + charges;
-        },
+    Alpine.data('ItemList', function() {
+      return {
         addItemRow() {
           this.items.push({
             price: 0,
@@ -436,6 +466,16 @@
             inputEl[0].focus();
           });
           this.$dispatch('item-added');
+        },
+        removeItemRow(index) {
+          let confirmed = confirm('Remove item? Gak bisa di-undo ya');
+          if (!confirmed) {
+            return;
+          }
+          this.items.splice(index, 1);
+          // this.calculateSum();
+          // this.calculateTaxPercent();
+          this.$dispatch('item-removed');
         },
         toggleParticipants(index, checked) {
           if (checked) {
@@ -463,25 +503,11 @@
             }
           ];
         },
-        removeItemRow(index) {
-          let confirmed = confirm('Remove item? Gak bisa di-undo ya');
-          if (!confirmed) {
-            return;
-          }
-          this.items.splice(index, 1);
-          // this.calculateSum();
-          // this.calculateTaxPercent();
-          this.$dispatch('item-removed');
-        },
+      };
+    });
 
-        // charges
-        charges: this.$persist([
-          {
-            name: '',
-            price: 0,
-            percent: 0
-          }
-        ]),
+    Alpine.data('ChargesList', function() {
+      return {
         addChargeRow() {
           this.charges.push(
               {
@@ -496,17 +522,9 @@
           // this.calculateSum();
           this.$dispatch('charge-removed');
         },
-        calculateTaxPercent() {
-          this.calculateSum();
-          let subtotal = this.subtotal;
-          this.charges.forEach((charge) => {
-            let price = parseInt(charge.price.toString().replaceAll(',', ''));
-            charge.percent = price / subtotal;
-            subtotal += price;
-          });
-        }
       };
     });
+
   });
 </script>
 </body>
