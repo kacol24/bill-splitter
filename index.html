@@ -354,48 +354,35 @@
                 <template x-if="selectedParticipantIndex != null && participants.length">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="editParticipantModalLabel"
-                                x-text="participants[selectedParticipantIndex].name">
-                                Edit Anggota
-                            </h1>
+                            <input type="text" class="form-control" id="edit_modal_name"
+                                   x-model="participants[selectedParticipantIndex].name">
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="edit_modal_name" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="edit_modal_name"
-                                       x-model="participants[selectedParticipantIndex].name">
-                            </div>
                             <template x-for="(item, index) in items" :key="index">
-                                <div class="row gx-2 mb-2 align-items-center">
-                                    <div class="col-1">
-                                        <span x-text="index + 1">1</span>.
-                                    </div>
+                                <div class="row gx-2 mb-2 align-items-center w-100">
                                     <div class="col">
-                                        <input type="text" class="form-control" aria-label="item name"
-                                               :x-ref="'item-' + (index+1)"
-                                               x-model="item.name">
+                                        <span x-text="item.name"></span>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-3 text-end">
+                                        Rp<span class="p-0" x-text="number_format(item.price)">123,456,789</span>
+                                    </div>
+                                    <div class="col-auto">
                                         <div class="input-group">
-                                            <span class="input-group-text">Rp</span>
-                                            <input type="text" inputmode="numeric" class="form-control text-end"
-                                                   aria-label="subtotal"
-                                                   @focus="$event.target.select()"
-                                                   @keyup.enter="addItemRow()"
-                                                   @change="calculateTaxPercent()"
-                                                   @blur="calculateTaxPercent()"
-                                                   x-model.lazy="item.price"
-                                                   x-mask:dynamic="$money($input)">
-                                        </div>
-                                    </div>
-                                    <div class="col-1">
-                                        <template x-if="items.length > 1">
-                                            <button class="btn btn-danger btn-sm"
-                                                    @click="removeItemRow(index)">
+                                            <button class="btn btn-secondary btn-sm" style="width: 31px;">
                                                 -
                                             </button>
-                                        </template>
+                                            <input type="text" readonly
+                                                   class="form-control-plaintext text-center w-auto"
+                                                   value="0" style="max-width: 30px">
+                                            <button class="btn btn-secondary btn-sm" style="width: 31px;">
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-12" style="min-height: 24px">
+                                        <small class="text-muted"
+                                               x-text="_.map(item.participants, 'id').join(', ')"></small>
                                     </div>
                                 </div>
                             </template>
