@@ -28,17 +28,22 @@
          @charge-removed="calculateSum()">
         <div id="Bill"
              x-data="ItemList">
-            <div class="accordion accordion-flush" id="accordion-bill">
+            <div class="accordion accordion-flush" id="accordion-bill"
+                 @hide-bs-collapse.dot="shown = 0"
+                 @show-bs-collapse.dot="shown = 1"
+                 x-data="{ shown: $persist(0).as('_x_bill-collapse') }">
                 <div class="accordion-item">
                     <h2 class="accordion-header sticky-top">
                         <button class="accordion-button px-2" data-bs-toggle="collapse"
                                 data-bs-target="#collapse-bill" aria-expanded="true"
-                                aria-controls="collapse-bill">
+                                aria-controls="collapse-bill"
+                                :class="{ 'collapsed': ! shown }">
                             Bill
                             (<span x-text="items.length">1</span>)
                         </button>
                     </h2>
-                    <div id="collapse-bill" class="accordion-collapse collapse show">
+                    <div id="collapse-bill" class="accordion-collapse collapse"
+                         :class="{ 'show': shown }">
                         <div class="accordion-body p-2">
                             <div class="row gx-2 border-bottom align-items-center mb-2">
                                 <div class="col-6">
@@ -103,17 +108,22 @@
                 </div>
             </div>
         </div>
-        <div class="accordion accordion-flush" id="accordion-participant">
+        <div class="accordion accordion-flush" id="accordion-participant"
+             @hide-bs-collapse.dot="shown = 0"
+             @show-bs-collapse.dot="shown = 1"
+             x-data="{ shown: $persist(0).as('_x_participant-collapse') }">
             <div class="accordion-item">
                 <h2 class="accordion-header sticky-top">
                     <button class="accordion-button px-2" data-bs-toggle="collapse"
                             data-bs-target="#collapse-participant" aria-expanded="true"
-                            aria-controls="collapse-participant">
+                            aria-controls="collapse-participant"
+                            :class="{ 'collapsed': ! shown }">
                         Anggota
                         (<span x-text="participants.length">1</span>)
                     </button>
                 </h2>
-                <div id="collapse-participant" class="accordion-collapse collapse show">
+                <div id="collapse-participant" class="accordion-collapse collapse"
+                     :class="{ 'show': shown }">
                     <div class="accordion-body p-2">
                         <div class="row gx-2 border-bottom align-items-center mb-2">
                             <div class="col-6">
