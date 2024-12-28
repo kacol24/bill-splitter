@@ -29,17 +29,16 @@
         <div id="Bill"
              x-data="ItemList">
             <div class="accordion accordion-flush" id="accordion-bill"
-                 @hide-bs-collapse.dot="shown = 0"
-                 @show-bs-collapse.dot="shown = 1"
                  x-data="{ shown: $persist(0).as('_x_bill-collapse') }">
                 <div class="accordion-item">
                     <h2 class="accordion-header sticky-top">
                         <button class="accordion-button px-2" data-bs-toggle="collapse"
                                 data-bs-target="#collapse-bill" aria-expanded="true"
                                 aria-controls="collapse-bill"
-                                :class="{ 'collapsed': ! shown }">
+                                :class="{ 'collapsed': ! shown }"
+                                @click="shown = ! shown">
                             Bill
-                            (<span x-text="items.length">1</span>)
+                            (<span x-text="items.length">0</span>)
                         </button>
                     </h2>
                     <div id="collapse-bill" class="accordion-collapse collapse"
@@ -108,134 +107,165 @@
                 </div>
             </div>
         </div>
-        <div class="accordion accordion-flush" id="accordion-participant"
-             @hide-bs-collapse.dot="shown = 0"
-             @show-bs-collapse.dot="shown = 1"
-             x-data="{ shown: $persist(0).as('_x_participant-collapse') }">
-            <div class="accordion-item">
-                <h2 class="accordion-header sticky-top">
-                    <button class="accordion-button px-2" data-bs-toggle="collapse"
-                            data-bs-target="#collapse-participant" aria-expanded="true"
-                            aria-controls="collapse-participant"
-                            :class="{ 'collapsed': ! shown }">
-                        Anggota
-                        (<span x-text="participants.length">1</span>)
-                    </button>
-                </h2>
-                <div id="collapse-participant" class="accordion-collapse collapse"
-                     :class="{ 'show': shown }">
-                    <div class="accordion-body p-2">
-                        <div class="row gx-2 border-bottom align-items-center mb-2">
-                            <div class="col-6">
-                                <h6 class="mb-0">Nama</h6>
-                            </div>
-                            <div class="col">
-                                <h6 class="mb-0">Total</h6>
-                            </div>
-                            <div class="col-auto">
-                                <div x-show="participants.length">
-                                    <button class="btn btn-danger btn-sm mb-2"
-                                            @click.prevent="clearParticipants()">
-                                        Clear
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <template x-for="(participant, index) in participants" :key="participant.id">
-                            <div class="row gx-2 mb-2 align-items-center"
-                                 x-id="['collapse-participant']">
-                                <div class="col-1">
-                                    <span x-text="index + 1">1</span>.
+        <div id="Participant"
+             x-data="ParticipantList">
+            <div class="accordion accordion-flush" id="accordion-participant"
+                 x-data="{ shown: $persist(0).as('_x_participant-collapse') }">
+                <div class="accordion-item">
+                    <h2 class="accordion-header sticky-top">
+                        <button class="accordion-button px-2" data-bs-toggle="collapse"
+                                data-bs-target="#collapse-participant" aria-expanded="true"
+                                aria-controls="collapse-participant"
+                                :class="{ 'collapsed': ! shown }"
+                                @click="shown = ! shown">
+                            Anggota
+                            (<span x-text="participants.length">0</span>)
+                        </button>
+                    </h2>
+                    <div id="collapse-participant" class="accordion-collapse collapse"
+                         :class="{ 'show': shown }">
+                        <div class="accordion-body p-2">
+                            <div class="row gx-2 border-bottom align-items-center mb-2">
+                                <div class="col-6">
+                                    <h6 class="mb-0">Nama</h6>
                                 </div>
                                 <div class="col">
-                                    <a href="#"
-                                       data-bs-toggle="modal"
-                                       data-bs-target="#participantModal"
-                                       x-text="participant.name">
-                                        Name
-                                    </a>
+                                    <h6 class="mb-0">Total</h6>
                                 </div>
-                                <div class="col text-end">
-                                    <a data-bs-toggle="collapse"
-                                       :href="'#' + $id('collapse-participant')">
-                                        Rp<span class="p-0"
-                                                x-text="number_format(participant.sum)">123,456,789</span>
-                                    </a>
-                                </div>
-                                <div class="col-1">
-                                    <template x-if="participants.length > 1">
-                                        <button class="btn btn-danger btn-sm"
-                                                @click="removeParticipantRow(index)">
-                                            -
+                                <div class="col-auto">
+                                    <div x-show="participants.length">
+                                        <button class="btn btn-danger btn-sm mb-2"
+                                                @click.prevent="clearParticipants()">
+                                            Clear
                                         </button>
-                                    </template>
-                                </div>
-                                <div class="col-11">
-                                    <div class="collapse"
-                                         :id="$id('collapse-participant')">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-sm mb-0 w-100 text-nowrap mt-1 mb-2">
-                                                <tbody>
-                                                <template x-for="(item, index) in participant.items" :key="index">
-                                                    <tr>
-                                                        <td class="text-end" style="width: 8.333%;">
-                                                            <span x-text="index + 1"></span>.
-                                                        </td>
-                                                        <td style="width: 61.66666667%">
-                                                            <span class="p-0" x-text="item.name"></span>
-                                                            (<span class="p-0" x-text="item.split"></span>)
-                                                        </td>
-                                                        <td class="text-end">
-                                                            Rp<span class="p-0"
-                                                                    x-text="number_format(item.price)">123,456,789</span>
-                                                        </td>
-                                                    </tr>
-                                                </template>
-                                                </tbody>
-                                                <tfoot>
-                                                <template x-for="(detail, index) in participant.breakdown"
-                                                          :key="index">
-                                                    <tr x-show="detail.value > 0 || detail.key == 'Subtotal'">
-                                                        <td class="text-end" colspan="2">
-                                                            <span class="p-0" x-text="detail.key"></span>
-                                                        </td>
-                                                        <td class=" text-end">
-                                                            Rp<span class="p-0"
-                                                                    x-text="number_format(detail.value)">123,456,789</span>
-                                                        </td>
-                                                    </tr>
-                                                </template>
-                                                </tfoot>
-                                            </table>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </template>
-                        <div class="sticky-top bottom-0 top-auto bg-dark">
-                            <div class="col-12 mt-3">
-                                <button class="btn btn-primary w-100"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#participantModal">
-                                    +
-                                </button>
-                            </div>
-                            <div style="min-height: 24px" class="mt-2">
-                                <div class="row gx-2" x-show="sum > 0">
+                            <template x-for="(participant, index) in participants" :key="participant.id">
+                                <div class="row gx-2 mb-2 align-items-center"
+                                     x-id="['collapse-participant']">
+                                    <div class="col-1">
+                                        <span x-text="index + 1">1</span>.
+                                    </div>
+                                    <div class="col">
+                                        <a href="#"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#editParticipantModal"
+                                           @click="setModal(index)"
+                                           x-text="participant.name">
+                                            Name
+                                        </a>
+                                    </div>
+                                    <div class="col text-end">
+                                        <a data-bs-toggle="collapse"
+                                           :href="'#' + $id('collapse-participant')">
+                                            Rp<span class="p-0"
+                                                    x-text="number_format(participant.sum)">123,456,789</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-1">
+                                        <template x-if="participants.length > 1">
+                                            <button class="btn btn-danger btn-sm"
+                                                    @click="removeParticipantRow(index)">
+                                                -
+                                            </button>
+                                        </template>
+                                    </div>
                                     <div class="col-11">
-                                        <div class="row gx-3 justify-content-end align-items-center"
-                                             :class="{'text-success': sum >= grandtotal}">
-                                            <div class="col text-end">
-                                                Sum
+                                        <div class="collapse"
+                                             :id="$id('collapse-participant')">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-sm mb-0 w-100 text-nowrap mt-1 mb-2">
+                                                    <tbody>
+                                                    <template x-for="(item, index) in participant.items" :key="index">
+                                                        <tr>
+                                                            <td class="text-end" style="width: 8.333%;">
+                                                                <span x-text="index + 1"></span>.
+                                                            </td>
+                                                            <td style="width: 61.66666667%">
+                                                                <span class="p-0" x-text="item.name"></span>
+                                                                (<span class="p-0" x-text="item.split"></span>)
+                                                            </td>
+                                                            <td class="text-end">
+                                                                Rp<span class="p-0"
+                                                                        x-text="number_format(item.price)">123,456,789</span>
+                                                            </td>
+                                                        </tr>
+                                                    </template>
+                                                    </tbody>
+                                                    <tfoot>
+                                                    <template x-for="(detail, index) in participant.breakdown"
+                                                              :key="index">
+                                                        <tr x-show="detail.value > 0 || detail.key == 'Subtotal'">
+                                                            <td class="text-end" colspan="2">
+                                                                <span class="p-0" x-text="detail.key"></span>
+                                                            </td>
+                                                            <td class=" text-end">
+                                                                Rp<span class="p-0"
+                                                                        x-text="number_format(detail.value)">123,456,789</span>
+                                                            </td>
+                                                        </tr>
+                                                    </template>
+                                                    </tfoot>
+                                                </table>
                                             </div>
-                                            <div class="col-5 text-end text-nowrap">
-                                                Rp<span class="p-0" x-text="number_format(sum)">123,456,789</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <div class="sticky-top bottom-0 top-auto bg-dark">
+                                <div class="col-12 mt-3">
+                                    <button class="btn btn-primary w-100"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#addParticipantModal">
+                                        +
+                                    </button>
+                                </div>
+                                <div style="min-height: 24px" class="mt-2">
+                                    <div class="row gx-2" x-show="sum > 0">
+                                        <div class="col-11">
+                                            <div class="row gx-3 justify-content-end align-items-center"
+                                                 :class="{'text-success': sum >= grandtotal}">
+                                                <div class="col text-end">
+                                                    Sum
+                                                </div>
+                                                <div class="col-5 text-end text-nowrap">
+                                                    Rp<span class="p-0" x-text="number_format(sum)">123,456,789</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="addParticipantModal" tabindex="-1" aria-labelledby="addParticipantModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="addParticipantModalLabel">
+                                Tambah Anggota
+                            </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form @submit.prevent="addParticipantRow()">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="add_modal_name" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="add_modal_name"
+                                           x-model="participant.name">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button class="btn btn-primary" data-bs-dismiss="modal" type="submit">
+                                    Save changes
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -318,24 +348,60 @@
                 </div>
             </template>
         </div>
-        <div class="modal fade" id="participantModal" tabindex="-1" aria-labelledby="participantModalLabel"
+        <div class="modal fade" id="editParticipantModal" tabindex="-1" aria-labelledby="editParticipantModalLabel"
              aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="participantModalLabel">
-                            Anggota
-                        </h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <template x-if="selectedParticipantIndex != null && participants.length">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="editParticipantModalLabel"
+                                x-text="participants[selectedParticipantIndex].name">
+                                Edit Anggota
+                            </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="edit_modal_name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="edit_modal_name"
+                                       x-model="participants[selectedParticipantIndex].name">
+                            </div>
+                            <template x-for="(item, index) in items" :key="index">
+                                <div class="row gx-2 mb-2 align-items-center">
+                                    <div class="col-1">
+                                        <span x-text="index + 1">1</span>.
+                                    </div>
+                                    <div class="col">
+                                        <input type="text" class="form-control" aria-label="item name"
+                                               :x-ref="'item-' + (index+1)"
+                                               x-model="item.name">
+                                    </div>
+                                    <div class="col">
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="text" inputmode="numeric" class="form-control text-end"
+                                                   aria-label="subtotal"
+                                                   @focus="$event.target.select()"
+                                                   @keyup.enter="addItemRow()"
+                                                   @change="calculateTaxPercent()"
+                                                   @blur="calculateTaxPercent()"
+                                                   x-model.lazy="item.price"
+                                                   x-mask:dynamic="$money($input)">
+                                        </div>
+                                    </div>
+                                    <div class="col-1">
+                                        <template x-if="items.length > 1">
+                                            <button class="btn btn-danger btn-sm"
+                                                    @click="removeItemRow(index)">
+                                                -
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        ...
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                    </div>
-                </div>
+                </template>
             </div>
         </div>
     </div>
@@ -345,212 +411,13 @@
         crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 <script src="js/utils.js"></script>
+<script src="js/app.js"></script>
 <script>
-  document.addEventListener('alpine:init', function() {
-    Alpine.data('BillSplitter', function() {
-      return {
-        init() {
-          this.calculateSum();
-        },
+  const myModal = document.getElementById('addParticipantModal');
+  const myInput = document.getElementById('add_modal_name');
 
-        // participants
-        participants: this.$persist([]),
-        calculateSum() {
-          this.participants.forEach(participant => {
-            participant.sum = 0;
-            participant.items = [];
-            participant.breakdown = [];
-          });
-          this.items.forEach(item => {
-            const divider = item.participants.length;
-            const price = parseInt(item.price.toString().replaceAll(',', ''));
-            const pricePerParticipant = price / divider;
-            item.participants.forEach(participantId => {
-              const participantIndex = this.participants.findIndex(participant => participant.id == participantId);
-              this.participants[participantIndex].items.push({
-                'name': item.name,
-                'price': pricePerParticipant,
-                'split': '1/' + divider
-              });
-              this.participants[participantIndex].sum += pricePerParticipant;
-            });
-          });
-          this.participants.forEach(participant => {
-            participant.breakdown.push({
-              'key': 'Subtotal',
-              'value': participant.sum
-            });
-            this.charges.forEach(charge => {
-              let extra = participant.sum * charge.percent;
-              participant.breakdown.push({
-                'key': charge.name + ' (' + Math.round(charge.percent * 1000) / 10 + '%)',
-                'value': extra
-              });
-              participant.sum += extra;
-            });
-            participant.sum = Math.ceil(participant.sum);
-          });
-        },
-        get sum() {
-          return _.sumBy(this.participants, participant => participant.sum);
-        },
-
-        // items
-        items: this.$persist([
-          {
-            price: 0,
-            participants: []
-          }
-        ]),
-        get subtotal() {
-          return _.sumBy(this.items, item => parseInt(item.price.toString().replaceAll(',', '')));
-        },
-        get grandtotal() {
-          let charges = _.sumBy(this.charges, charge => parseInt(charge.price.toString().replaceAll(',', '')));
-
-          return this.subtotal + charges;
-        },
-
-        // charges
-        charges: this.$persist([
-          {
-            name: '',
-            price: 0,
-            percent: 0
-          }
-        ]),
-        calculateTaxPercent() {
-          this.calculateSum();
-          let subtotal = this.subtotal;
-          this.charges.forEach((charge) => {
-            let price = parseInt(charge.price.toString().replaceAll(',', ''));
-            charge.percent = price / subtotal;
-            subtotal += price;
-          });
-        }
-      };
-    });
-
-    Alpine.data('ParticipantList', function() {
-      return {
-        addParticipantRow() {
-          this.participants.push({
-            id: this.participants.length.toString() + Date.now(),
-            sum: 0
-          });
-          let ref = 'participant-' + this.participants.length;
-          this.$nextTick(() => {
-            let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
-            inputEl[0].focus();
-          });
-          // this.calculateSum();
-          this.$dispatch('participant-added');
-        },
-        removeParticipantRow(index) {
-          let confirmed = confirm('Remove anggota? Gak bisa di-undo ya');
-          if (!confirmed) {
-            return;
-          }
-
-          let deleted = this.participants.splice(index, 1);
-          this.items.forEach(item => {
-            const theParticipant = item.participants.findIndex(participant => participant == deleted[0].id);
-            if (theParticipant < 0) {
-              return;
-            }
-            item.participants.splice(theParticipant, 1);
-          });
-          // this.calculateSum();
-          this.$dispatch('participant-removed');
-        },
-        clearParticipants() {
-          let confirmed = confirm('Clear anggota? Gak bisa di-undo ya');
-          if (!confirmed) {
-            return;
-          }
-          this.participants = [];
-          this.items.forEach(item => {
-            item.participants = [];
-            item.allParticipants = false;
-          });
-          // this.calculateSum();
-          this.$dispatch('participant-cleared');
-        }
-      };
-    });
-
-    Alpine.data('ItemList', function() {
-      return {
-        addItemRow() {
-          this.items.push({
-            price: 0,
-            participants: []
-          });
-          let ref = 'item-' + this.items.length;
-          this.$nextTick(() => {
-            let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
-            inputEl[0].focus();
-          });
-          this.$dispatch('item-added');
-        },
-        removeItemRow(index) {
-          let confirmed = confirm('Remove item? Gak bisa di-undo ya');
-          if (!confirmed) {
-            return;
-          }
-          this.items.splice(index, 1);
-          // this.calculateSum();
-          // this.calculateTaxPercent();
-          this.$dispatch('item-removed');
-        },
-        toggleParticipants(index, checked) {
-          if (checked) {
-            this.items[index].participants = _.map(this.participants, 'id');
-          } else {
-            this.items[index].participants = [];
-          }
-          // this.calculateSum();
-          this.$dispatch('participant-toggled');
-        },
-        clearBill() {
-          let confirmed = confirm('Clear bill? Gak bisa di-undo ya');
-          if (!confirmed) {
-            return;
-          }
-          this.items = [];
-          this.charges = [];
-          // this.calculateSum();
-          this.$dispatch('bill-cleared');
-          this.charges = [
-            {
-              name: '',
-              price: 0,
-              percent: 0
-            }
-          ];
-        }
-      };
-    });
-
-    Alpine.data('ChargesList', function() {
-      return {
-        addChargeRow() {
-          this.charges.push(
-              {
-                name: '',
-                price: 0,
-                percent: 0
-              }
-          );
-        },
-        removeChargeRow(index) {
-          this.charges.splice(index, 1);
-          // this.calculateSum();
-          this.$dispatch('charge-removed');
-        }
-      };
-    });
-
+  myModal.addEventListener('shown.bs.modal', () => {
+    myInput.focus();
   });
 </script>
 </body>
