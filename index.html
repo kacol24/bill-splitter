@@ -20,6 +20,7 @@
 <div class="container">
     <div x-data="BillSplitter"
          @item-removed.window="calculateTaxPercent()"
+         @qty-changed.window="calculateSum()"
          @participant-added.window="calculateSum()"
          @participant-removed.window="calculateSum()"
          @participant-cleared.windows="calculateSum()"
@@ -353,13 +354,14 @@
             </div>
         </div>
         <div class="modal fade" id="editParticipantModal" tabindex="-1" aria-labelledby="editParticipantModalLabel"
-             aria-hidden="true">
+             aria-hidden="true"
+             @hide-bs-modal.dot="selectedParticipantIndex = null">
             <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
                 <template x-if="selectedParticipantIndex != null && participants.length">
                     <div class="modal-content">
                         <div class="modal-header">
                             <input type="text" class="form-control" id="edit_modal_name"
-                                   x-model="participants[selectedParticipantIndex].name">
+                                   x-model="selectedParticipant.name">
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
@@ -373,20 +375,23 @@
                                     </div>
                                     <div class="col-auto">
                                         <div class="input-group">
-                                            <button class="btn btn-secondary btn-sm" style="width: 31px;">
+                                            <button class="btn btn-secondary btn-sm" style="width: 31px;"
+                                                    @click="subQty(index)">
                                                 -
                                             </button>
                                             <input type="text" readonly
                                                    class="form-control-plaintext text-center w-auto"
-                                                   value="0" style="max-width: 30px">
-                                            <button class="btn btn-secondary btn-sm" style="width: 31px;">
+                                                   style="max-width: 30px"
+                                                   :value="item.participants[getParticipantIndex(item)] ? item.participants[getParticipantIndex(item)].qty : 0">
+                                            <button class="btn btn-secondary btn-sm" style="width: 31px;"
+                                                    @click="addQty(index)">
                                                 +
                                             </button>
                                         </div>
                                     </div>
                                     <div class="col-12" style="min-height: 24px">
                                         <small class="text-muted"
-                                               x-text="_.map(item.participants, 'id').join(', ')"></small>
+                                               x-text="_.map(item.participants, 'name').join(', ')"></small>
                                     </div>
                                 </div>
                             </template>
@@ -404,12 +409,14 @@
 <script src="js/utils.js"></script>
 <script src="js/app.js"></script>
 <script>
-  const myModal = document.getElementById('addParticipantModal');
+  const addModal = document.getElementById('addParticipantModal');
   const myInput = document.getElementById('add_modal_name');
 
-  myModal.addEventListener('shown.bs.modal', () => {
+  addModal.addEventListener('shown.bs.modal', () => {
     myInput.focus();
   });
+
+  const editModal = document.getElementById('editParticipantModal');
 </script>
 </body>
 </html>

@@ -7,14 +7,14 @@ document.addEventListener('alpine:init', function() {
 
       // participants
       participants: this.$persist([]),
-      selectedParticipant: {
-        id: null,
-        name: '',
-        sum: 0,
-        items: [],
-        breakdown: {}
-      },
       selectedParticipantIndex: null,
+      get selectedParticipant() {
+        return this.participants[this.selectedParticipantIndex];
+      },
+      getParticipantIndex(item) {
+        return item.participants.findIndex(
+            participant => participant.id == this.selectedParticipant.id);
+      },
       calculateSum() {
         this.participants.forEach(participant => {
           participant.sum = 0;
@@ -22,12 +22,16 @@ document.addEventListener('alpine:init', function() {
           participant.breakdown = [];
         });
         this.items.forEach(item => {
-          const divider = item.participants.length;
+          const divider = _.sum(_.map(item.participants, 'qty'));
           const price = parseInt(item.price.toString().replaceAll(',', ''));
-          const pricePerParticipant = price / divider;
-          item.participants.forEach(participantId => {
+          const pricePerQty = price / divider;
+          item.participants.forEach(itemParticipant => {
             const participantIndex = this.participants.findIndex(
-                participant => participant.id == participantId);
+                participant => {
+                  return participant.id == itemParticipant.id;
+                }
+            );
+            const pricePerParticipant = pricePerQty * itemParticipant.qty;
             this.participants[participantIndex].items.push({
               'name': item.name,
               'price': pricePerParticipant,
@@ -44,8 +48,7 @@ document.addEventListener('alpine:init', function() {
           this.charges.forEach(charge => {
             let extra = participant.sum * charge.percent;
             participant.breakdown.push({
-              'key': charge.name + ' (' + Math.round(charge.percent * 1000) /
-                  10 + '%)',
+              'key': `${charge.name} (${Math.round(charge.percent * 100)}%)`,
               'value': extra
             });
             participant.sum += extra;
@@ -94,6 +97,50 @@ document.addEventListener('alpine:init', function() {
       },
       setModal(index) {
         this.selectedParticipantIndex = index;
+      },
+      addQty(index) {
+        if (this.selectedParticipantIndex == null) {
+          throw new Error('Harus pilih anggota.');
+        }
+
+        let selectedParticipant = this.participants[this.selectedParticipantIndex];
+        let participantIndex = this.items[index].participants.findIndex(
+            itemParticipant => {
+              return itemParticipant.id === selectedParticipant.id;
+            }
+        );
+        if (participantIndex < 0) {
+          this.items[index].participants.push({
+            id: selectedParticipant.id,
+            name: selectedParticipant.name,
+            qty: 1
+          });
+        } else {
+          this.items[index].participants[participantIndex].qty++;
+        }
+        this.$dispatch('qty-changed');
+      },
+      subQty(index) {
+        if (this.selectedParticipantIndex == null) {
+          throw new Error('Harus pilih anggota.');
+        }
+
+        let selectedParticipant = this.participants[this.selectedParticipantIndex];
+        let participantIndex = this.items[index].participants.findIndex(
+            itemParticipant => {
+              return itemParticipant.id === selectedParticipant.id;
+            }
+        );
+        if (participantIndex < 0) {
+          return;
+        }
+
+        if (this.items[index].participants[participantIndex].qty <= 0) {
+          return;
+        }
+
+        this.items[index].participants[participantIndex].qty--;
+        this.$dispatch('qty-changed');
       }
     };
   });
@@ -124,8 +171,9 @@ document.addEventListener('alpine:init', function() {
 
         let deleted = this.participants.splice(index, 1);
         this.items.forEach(item => {
-          const theParticipant = item.participants.findIndex(
-              participant => participant == deleted[0].id);
+          const theParticipant = item.participants.findIndex(participant => {
+            return participant.id == deleted[0].id;
+          });
           if (theParticipant < 0) {
             return;
           }
