@@ -15,17 +15,13 @@ document.addEventListener('alpine:init', function() {
         return item.participants.findIndex(
             participant => participant.id == this.selectedParticipant.id);
       },
-      getParticipantCsv(item) {
-        let mapped = [];
-        item.participants.forEach(participant => {
-          let push = participant.name;
-          if (participant.qty > 1) {
-            push = push + ` (${participant.qty})`;
-          }
-          mapped.push(push);
-        });
+      getParticipantCsv(participant) {
+        let push = participant.name;
+        if (participant.qty > 1) {
+          push = push + ` (${participant.qty})`;
+        }
 
-        return mapped.join(', ');
+        return push;
       },
       calculateSum() {
         this.participants.forEach(participant => {

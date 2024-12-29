@@ -390,8 +390,16 @@
                                         </div>
                                     </div>
                                     <div class="col-12" style="min-height: 24px">
-                                        <small class="text-muted"
-                                               x-text="getParticipantCsv(item)"></small>
+                                        <template x-for="participant in item.participants" :key="participant.id">
+                                            <small>
+                                                <span class="badge rounded-pill me-1"
+                                                      :class="{
+                                                        'text-bg-info': participant.id == selectedParticipant.id,
+                                                        'text-bg-secondary': participant.id != selectedParticipant.id
+                                                      }"
+                                                      x-text="getParticipantCsv(participant)"></span>
+                                            </small>
+                                        </template>
                                     </div>
                                 </div>
                             </template>
