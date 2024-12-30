@@ -215,6 +215,7 @@ document.addEventListener('alpine:init', function() {
           messages.push(this.formatForWhatsapp(index).join('\n'));
           if (index < this.participants.length - 1) {
             messages.push([]);
+            messages.push([]);
           }
         });
 
