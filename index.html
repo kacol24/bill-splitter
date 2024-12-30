@@ -392,7 +392,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body p-0">
-                            <div class="container-fluid">
+                            <div class="container-fluid px-0">
                                 <template x-for="(item, index) in items" :key="index">
                                     <div class="row align-items-center py-2 border-bottom"
                                          :class="{ 'bg-info-subtle': item.participants[getParticipantIndex(item)] && item.participants[getParticipantIndex(item)].qty > 0 }">
