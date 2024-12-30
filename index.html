@@ -13,6 +13,10 @@
         .btn-sm {
             min-width: 31px;
         }
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
     </style>
     <!--<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/sort@3.14.6/dist/cdn.min.js"></script>-->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.14.6/dist/cdn.min.js"></script>
@@ -20,7 +24,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.6/dist/cdn.min.js"></script>
 </head>
 <body data-bs-theme="dark">
-<div class="container">
+<div class="container px-0">
     <div x-data="BillSplitter"
          @item-removed.window="calculateTaxPercent()"
          @qty-changed.window="calculateSum()"
