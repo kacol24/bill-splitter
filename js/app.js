@@ -43,7 +43,7 @@ document.addEventListener('alpine:init', function() {
             this.participants[participantIndex].items.push({
               'name': item.name,
               'price': pricePerParticipant,
-              'split': '1/' + divider
+              'split': `${itemParticipant.qty}/${divider}`
             });
             this.participants[participantIndex].sum += pricePerParticipant;
           });
