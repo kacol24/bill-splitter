@@ -56,7 +56,8 @@ document.addEventListener('alpine:init', function() {
           this.charges.forEach(charge => {
             let extra = participant.sum * charge.percent;
             participant.breakdown.push({
-              'key': `${charge.name} (${Math.round(charge.percent * 1000) / 10}%)`,
+              'key': `${charge.name} (${Math.round(charge.percent * 1000) /
+              10}%)`,
               'value': extra
             });
             participant.sum += extra;
@@ -148,6 +149,11 @@ document.addEventListener('alpine:init', function() {
         }
 
         this.items[index].participants[participantIndex].qty--;
+
+        if (this.items[index].participants[participantIndex].qty <= 0) {
+          this.items[index].participants.splice(participantIndex, 1);
+        }
+
         this.$dispatch('qty-changed');
       }
     };
