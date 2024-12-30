@@ -367,13 +367,6 @@ document.addEventListener('alpine:init', function() {
         this.charges = [];
         // this.calculateSum();
         this.$dispatch('bill-cleared');
-        this.charges = [
-          {
-            name: '',
-            price: 0,
-            percent: 0
-          }
-        ];
       }
     };
   });

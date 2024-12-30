@@ -10,6 +10,9 @@
         .container {
             max-width: 540px;
         }
+        .btn-sm {
+            min-width: 31px;
+        }
     </style>
     <!--<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/sort@3.14.6/dist/cdn.min.js"></script>-->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.14.6/dist/cdn.min.js"></script>
@@ -103,9 +106,10 @@
                                 </button>
                             </div>
 
-                            <div class="sticky-top bottom-0 top-auto bg-dark pt-1">
+                            <div class="sticky-top bottom-0 top-auto bg-dark pt-1"
+                                 x-data="ChargesList">
                                 <template x-if="subtotal > 0">
-                                    <div class="row gx-2 mb-1 mt-2">
+                                    <div class="row gx-2 mb-1 mt-2 align-items-center">
                                         <div class="col-11">
                                             <div class="row gx-3 justify-content-end align-items-center">
                                                 <div class="col text-end">
@@ -117,22 +121,22 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-1">
+                                            <button class="btn btn-primary btn-sm"
+                                                    @click="addChargeRow()">
+                                                +
+                                            </button>
+                                        </div>
                                     </div>
                                 </template>
-                                <template x-if="subtotal > 0"
-                                          x-data="ChargesList">
+                                <template x-if="subtotal > 0">
                                     <template x-for="(charge, index) in charges" :key="index">
                                         <div class="row gx-2 mb-2 align-items-center">
-                                            <div class="col-1">
-                                                <button class="btn btn-primary btn-sm"
-                                                        @click="addChargeRow()">
-                                                    +
-                                                </button>
-                                            </div>
+                                            <div class="col-1"></div>
                                             <div class="col">
                                                 <div class="input-group">
                                                     <input type="text" class="form-control" aria-label="item name"
-                                                           placeholder="Cth: service charge, ppn"
+                                                           placeholder="ex: SC, PB1, etc.."
                                                            :x-ref="'item-' + (index+1)"
                                                            @change="calculateTaxPercent()"
                                                            @blur="calculateTaxPercent()"
@@ -172,7 +176,7 @@
                 </div>
             </div>
             <template x-if="grandtotal > 0">
-                <div class="sticky-top bottom-0 top-auto bg-dark pb-1">
+                <div class="sticky-top bottom-0 top-auto bg-dark">
                     <div class="row gx-2 mb-2">
                         <div class="col-11">
                             <div class="row gx-3 justify-content-end align-items-center"
@@ -190,7 +194,7 @@
                 </div>
             </template>
         </div>
-        <div id="Participant"
+        <div id="Participant" class="mt-2"
              x-data="ParticipantList">
             <div class="accordion accordion-flush" id="accordion-participant"
                  x-data="{ shown: $persist(0).as('_x_participant-collapse') }">
@@ -438,7 +442,7 @@
         crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 <script src="js/utils.js"></script>
-<script src="js/app.js?v=1.1.1"></script>
+<script src="js/app.js?v=1.1.2"></script>
 <script>
   const addModal = document.getElementById('addParticipantModal');
   const myInput = document.getElementById('add_modal_name');

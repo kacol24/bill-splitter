@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bill Splitter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        .container {
+            max-width: 540px;
+        }
+    </style>
+    <!--<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/sort@3.14.6/dist/cdn.min.js"></script>-->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.14.6/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.14.6/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.6/dist/cdn.min.js"></script>
+</head>
+<body data-bs-theme="dark">
+<div class="container">
+    <div x-data="BillSplitter"
+         @item-removed.window="calculateTaxPercent()"
+         @participant-added.window="calculateSum()"
+         @participant-removed.window="calculateSum()"
+         @participant-cleared.windows="calculateSum()"
+         @participant-toggled.window="calculateSum()"
+         @bill-cleared.window="calculateSum()"
+         @charge-removed="calculateSum()">
+        <div id="Participants"
+             x-data="ParticipantList">
+            <div class="d-flex justify-content-between align-items-center sticky-top bg-dark">
+                <h2>
+                    Anggota
+                    (<span x-text="participants.length">1</span>)
+                </h2>
+                <div x-show="participants.length">
+                    <button class="btn btn-danger btn-sm"
+                            @click.prevent="clearParticipants()">
+                        Clear
+                    </button>
+                </div>
+            </div>
+            <div class="row gx-2 border-bottom mb-2">
+                <div class="col">
+                    <h6>Nama</h6>
+                </div>
+                <div class="col">
+                    <h6>Total</h6>
+                </div>
+                <div class="col-1"></div>
+            </div>
+            <div class="overflow-y-auto overflow-x-hidden">
+                <template x-for="(participant, index) in participants" :key="participant.id">
+                    <div class="row gx-2 mb-2 align-items-center"
+                         x-id="['collapse-participant']">
+                        <div class="col-1">
+                            <span x-text="index + 1">1</span>.
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control" aria-label="item name"
+                                   :x-ref="'participant-' + (index+1)"
+                                   @keyup.enter="addParticipantRow()"
+                                   x-model="participant.name">
+                        </div>
+                        <div class="col text-end">
+                            <a data-bs-toggle="collapse"
+                               :href="'#' + $id('collapse-participant')">
+                                Rp<span class="p-0" x-text="number_format(participant.sum)">123,456,789</span>
+                            </a>
+                        </div>
+                        <div class="col-1">
+                            <template x-if="participants.length > 1">
+                                <button class="btn btn-danger btn-sm"
+                                        @click="removeParticipantRow(index)">
+                                    -
+                                </button>
+                            </template>
+                        </div>
+                        <div class="col-11">
+                            <div class="collapse"
+                                 :id="$id('collapse-participant')">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-sm mb-0 w-100 text-nowrap mt-1 mb-2">
+                                        <tbody>
+                                        <template x-for="(item, index) in participant.items" :key="index">
+                                            <tr>
+                                                <td class="text-end" style="width: 8.333%;">
+                                                    <span x-text="index + 1"></span>.
+                                                </td>
+                                                <td style="width: 61.66666667%">
+                                                    <span class="p-0" x-text="item.name"></span>
+                                                    (<span class="p-0" x-text="item.split"></span>)
+                                                </td>
+                                                <td class="text-end">
+                                                    Rp<span class="p-0"
+                                                            x-text="number_format(item.price)">123,456,789</span>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        </tbody>
+                                        <tfoot>
+                                        <template x-for="(detail, index) in participant.breakdown" :key="index">
+                                            <tr x-show="detail.value > 0 || detail.key == 'Subtotal'">
+                                                <td class="text-end" colspan="2">
+                                                    <span class="p-0" x-text="detail.key"></span>
+                                                </td>
+                                                <td class=" text-end">
+                                                    Rp<span class="p-0"
+                                                            x-text="number_format(detail.value)">123,456,789</span>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <div class="sticky-top bottom-0 top-auto bg-dark">
+                <div class="col-12 mt-3">
+                    <button class="btn btn-primary w-100"
+                            @click="addParticipantRow()">
+                        +
+                    </button>
+                </div>
+                <div style="min-height: 24px" class="mt-2">
+                    <div class="row gx-2" x-show="sum > 0">
+                        <div class="col-11">
+                            <div class="row gx-3 justify-content-end align-items-center"
+                                 :class="{'text-success': sum >= grandtotal}">
+                                <div class="col text-end">
+                                    Sum
+                                </div>
+                                <div class="col-5 text-end text-nowrap">
+                                    Rp<span class="p-0" x-text="number_format(sum)">123,456,789</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div id="Bill"
+             x-data="ItemList">
+            <div class="d-flex justify-content-between align-items-center sticky-top bg-dark">
+                <h2>
+                    Bill
+                    (<span x-text="items.length">1</span>)
+                </h2>
+                <div x-show="items.length">
+                    <button class="btn btn-danger btn-sm"
+                            @click.prevent="clearBill()">
+                        Clear
+                    </button>
+                </div>
+            </div>
+            <div class="row gx-2 border-bottom mb-2">
+                <div class="col">
+                    <h6>Item</h6>
+                </div>
+                <div class="col">
+                    <h6>Total</h6>
+                </div>
+                <div class="col-1"></div>
+            </div>
+            <template x-for="(item, index) in items" :key="index">
+                <div class="row gx-2 mb-2 align-items-center">
+                    <div class="col-1">
+                        <span x-text="index + 1">1</span>.
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" aria-label="item name"
+                               :x-ref="'item-' + (index+1)"
+                               x-model="item.name">
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="text" inputmode="numeric" class="form-control text-end"
+                                   aria-label="subtotal"
+                                   @focus="$event.target.select()"
+                                   @keyup.enter="addItemRow()"
+                                   @change="calculateTaxPercent()"
+                                   @blur="calculateTaxPercent()"
+                                   x-model.lazy="item.price"
+                                   x-mask:dynamic="$money($input)">
+                        </div>
+                    </div>
+                    <div class="col-1">
+                        <template x-if="items.length > 1">
+                            <button class="btn btn-danger btn-sm"
+                                    @click="removeItemRow(index)">
+                                -
+                            </button>
+                        </template>
+                    </div>
+                    <div class="col-11 mt-1" style="min-height: 26px">
+                        <div class="row gx-2">
+                            <div class="col-1">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox"
+                                               x-model="item.allParticipants"
+                                               @change="toggleParticipants(index, $event.target.checked)">
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="row gx-2">
+                                    <template x-for="(participant, index) in participants" :key="participant.id">
+                                        <div class="col-3">
+                                            <div class="form-check form-check-inline">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox"
+                                                           x-model="item.participants"
+                                                           :value="participant.id" @change="calculateSum">
+                                                    <span x-text="participant.name"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <div class="col-12 mt-3">
+                <button class="btn btn-primary w-100"
+                        @click="addItemRow()">
+                    +
+                </button>
+            </div>
+        </div>
+        <div class="sticky-top bottom-0 top-auto bg-dark py-1">
+            <template x-if="subtotal > 0">
+                <div class="row gx-2 mb-1 mt-2">
+                    <div class="col-11">
+                        <div class="row gx-3 justify-content-end align-items-center">
+                            <div class="col text-end">
+                                Subtotal
+                            </div>
+                            <div class="col-5 text-end text-nowrap">
+                                Rp<span class="p-0" x-text="number_format(subtotal)">123,456,789</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <template x-if="subtotal > 0"
+                      x-data="ChargesList">
+                <template x-for="(charge, index) in charges" :key="index">
+                    <div class="row gx-2 mb-2 align-items-center">
+                        <div class="col-1">
+                            <button class="btn btn-primary btn-sm"
+                                    @click="addChargeRow()">
+                                +
+                            </button>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <input type="text" class="form-control" aria-label="item name"
+                                       placeholder="Cth: service charge, ppn"
+                                       :x-ref="'item-' + (index+1)"
+                                       @change="calculateTaxPercent()"
+                                       @blur="calculateTaxPercent()"
+                                       x-model="charge.name">
+                                <span class="input-group-text">
+                                        <span x-text="Math.round(charge.percent * 1000) / 10">0</span>%
+                                    </span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" inputmode="numeric" class="form-control text-end"
+                                       aria-label="subtotal"
+                                       @focus="$event.target.select()"
+                                       @change="calculateTaxPercent()"
+                                       @blur="calculateTaxPercent()"
+                                       @keyup.enter="addChargeRow()"
+                                       x-model.lazy="charge.price"
+                                       x-mask:dynamic="$money($input)">
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <template x-if="charges.length > 1">
+                                <button class="btn btn-danger btn-sm"
+                                        @click="removeChargeRow(index)">
+                                    -
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </template>
+            <template x-if="grandtotal > 0">
+                <div class="row gx-2 mt-1">
+                    <div class="col-11">
+                        <div class="row gx-3 justify-content-end align-items-center"
+                             :class="{'text-success': sum >= grandtotal}">
+                            <div class="col text-end">
+                                Grand total
+                            </div>
+                            <div class="col-5 text-end text-nowrap fw-bold">
+                                Rp<span class="p-0" x-text="number_format(grandtotal)">123,456,789</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+<script src="js/utils.js"></script>
+<script>
+  document.addEventListener('alpine:init', function() {
+    Alpine.data('BillSplitter', function() {
+      return {
+        init() {
+          this.calculateSum();
+        },
+
+        // participants
+        participants: this.$persist([]),
+        calculateSum() {
+          this.participants.forEach(participant => {
+            participant.sum = 0;
+            participant.items = [];
+            participant.breakdown = [];
+          });
+          this.items.forEach(item => {
+            const divider = item.participants.length;
+            const price = parseInt(item.price.toString().replaceAll(',', ''));
+            const pricePerParticipant = price / divider;
+            item.participants.forEach(participantId => {
+              const participantIndex = this.participants.findIndex(participant => participant.id == participantId);
+              this.participants[participantIndex].items.push({
+                'name': item.name,
+                'price': pricePerParticipant,
+                'split': '1/' + divider
+              });
+              this.participants[participantIndex].sum += pricePerParticipant;
+            });
+          });
+          this.participants.forEach(participant => {
+            participant.breakdown.push({
+              'key': 'Subtotal',
+              'value': participant.sum
+            });
+            this.charges.forEach(charge => {
+              let extra = participant.sum * charge.percent;
+              participant.breakdown.push({
+                'key': charge.name + ' (' + Math.round(charge.percent * 1000) / 10 + '%)',
+                'value': extra
+              });
+              participant.sum += extra;
+            });
+            participant.sum = Math.ceil(participant.sum);
+          });
+        },
+        get sum() {
+          return _.sumBy(this.participants, participant => participant.sum);
+        },
+
+        // items
+        items: this.$persist([
+          {
+            price: 0,
+            participants: []
+          }
+        ]),
+        get subtotal() {
+          return _.sumBy(this.items, item => parseInt(item.price.toString().replaceAll(',', '')));
+        },
+        get grandtotal() {
+          let charges = _.sumBy(this.charges, charge => parseInt(charge.price.toString().replaceAll(',', '')));
+
+          return this.subtotal + charges;
+        },
+
+        // charges
+        charges: this.$persist([
+          {
+            name: '',
+            price: 0,
+            percent: 0
+          }
+        ]),
+        calculateTaxPercent() {
+          this.calculateSum();
+          let subtotal = this.subtotal;
+          this.charges.forEach((charge) => {
+            let price = parseInt(charge.price.toString().replaceAll(',', ''));
+            charge.percent = price / subtotal;
+            subtotal += price;
+          });
+        }
+      };
+    });
+
+    Alpine.data('ParticipantList', function() {
+      return {
+        addParticipantRow() {
+          this.participants.push({
+            id: this.participants.length.toString() + Date.now(),
+            sum: 0
+          });
+          let ref = 'participant-' + this.participants.length;
+          this.$nextTick(() => {
+            let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
+            inputEl[0].focus();
+          });
+          // this.calculateSum();
+          this.$dispatch('participant-added');
+        },
+        removeParticipantRow(index) {
+          let confirmed = confirm('Remove anggota? Gak bisa di-undo ya');
+          if (!confirmed) {
+            return;
+          }
+
+          let deleted = this.participants.splice(index, 1);
+          this.items.forEach(item => {
+            const theParticipant = item.participants.findIndex(participant => participant == deleted[0].id);
+            if (theParticipant < 0) {
+              return;
+            }
+            item.participants.splice(theParticipant, 1);
+          });
+          // this.calculateSum();
+          this.$dispatch('participant-removed');
+        },
+        clearParticipants() {
+          let confirmed = confirm('Clear anggota? Gak bisa di-undo ya');
+          if (!confirmed) {
+            return;
+          }
+          this.participants = [];
+          this.items.forEach(item => {
+            item.participants = [];
+            item.allParticipants = false;
+          });
+          // this.calculateSum();
+          this.$dispatch('participant-cleared');
+        },
+      };
+    });
+
+    Alpine.data('ItemList', function() {
+      return {
+        addItemRow() {
+          this.items.push({
+            price: 0,
+            participants: []
+          });
+          let ref = 'item-' + this.items.length;
+          this.$nextTick(() => {
+            let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
+            inputEl[0].focus();
+          });
+          this.$dispatch('item-added');
+        },
+        removeItemRow(index) {
+          let confirmed = confirm('Remove item? Gak bisa di-undo ya');
+          if (!confirmed) {
+            return;
+          }
+          this.items.splice(index, 1);
+          // this.calculateSum();
+          // this.calculateTaxPercent();
+          this.$dispatch('item-removed');
+        },
+        toggleParticipants(index, checked) {
+          if (checked) {
+            this.items[index].participants = _.map(this.participants, 'id');
+          } else {
+            this.items[index].participants = [];
+          }
+          // this.calculateSum();
+          this.$dispatch('participant-toggled');
+        },
+        clearBill() {
+          let confirmed = confirm('Clear bill? Gak bisa di-undo ya');
+          if (!confirmed) {
+            return;
+          }
+          this.items = [];
+          this.charges = [];
+          // this.calculateSum();
+          this.$dispatch('bill-cleared');
+          this.charges = [
+            {
+              name: '',
+              price: 0,
+              percent: 0
+            }
+          ];
+        },
+      };
+    });
+
+    Alpine.data('ChargesList', function() {
+      return {
+        addChargeRow() {
+          this.charges.push(
+              {
+                name: '',
+                price: 0,
+                percent: 0
+              }
+          );
+        },
+        removeChargeRow(index) {
+          this.charges.splice(index, 1);
+          // this.calculateSum();
+          this.$dispatch('charge-removed');
+        },
+      };
+    });
+
+  });
+</script>
+</body>
+</html>
