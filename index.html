@@ -328,7 +328,8 @@
                 </div>
             </div>
             <div style="min-height: 24px" class="mt-2 px-2">
-                <div class="row gx-2" x-show="sum > 0">
+                <div class="row gx-0"
+                     x-show="sum > 0">
                     <div class="col-1">
                         <a href="#" class="me-2 text-decoration-none"
                            @click.prevent="shareBill()">
@@ -340,8 +341,8 @@
                             </svg>
                         </a>
                     </div>
-                    <div class="col-11">
-                        <div class="row gx-3 justify-content-end align-items-center"
+                    <div class="col-10">
+                        <div class="row gx-2 justify-content-end align-items-center"
                              :class="{'text-success': sum >= grandtotal}">
                             <div class="col text-end">
                                 Sum
