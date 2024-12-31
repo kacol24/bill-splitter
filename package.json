@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "npm run development",
+    "development": "mix",
+    "watch": "mix watch",
+    "watch-poll": "mix watch -- --watch-options-poll=1000",
+    "hot": "mix watch --hot",
+    "prod": "npm run production",
+    "production": "mix --production"
+  },
+  "devDependencies": {
+    "laravel-mix": "^6.0"
+  },
+  "dependencies": {
+    "@alpinejs/mask": "^3.14.8",
+    "@alpinejs/persist": "^3.14.8",
+    "alpinejs": "^3.14.8",
+    "jimp": "^1.6.0",
+    "lodash": "^4.17.21",
+    "scribe.js-ocr": "^0.6.1",
+    "tesseract.js": "^5.1.1"
+  }
+}

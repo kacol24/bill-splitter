@@ -21,9 +21,9 @@
         }
     </style>
     <!--<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/sort@3.14.6/dist/cdn.min.js"></script>-->
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.14.6/dist/cdn.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.14.6/dist/cdn.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.6/dist/cdn.min.js"></script>
+<!--    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.14.6/dist/cdn.min.js"></script>-->
+<!--    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.14.6/dist/cdn.min.js"></script>-->
+<!--    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.6/dist/cdn.min.js"></script>-->
 </head>
 <body data-bs-theme="dark">
 <div class="container px-0">
@@ -106,10 +106,46 @@
                             </template>
 
                             <div class="col-12 mt-3">
-                                <button class="btn btn-primary w-100"
-                                        @click="addItemRow()">
-                                    +
+                                <div class="mb-2">
+                                    <button class="btn btn-primary w-100"
+                                            @click="addItemRow()">
+                                        +
+                                    </button>
+                                </div>
+                                <button class="btn btn-outline-primary w-100"
+                                        data-bs-toggle="modal" data-bs-target="#modalUpload">
+                                    Upload Nota
                                 </button>
+                                <div class="modal fade" id="modalUpload" data-bs-backdrop="static"
+                                     data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalUploadLabel"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <form @submit.prevent="uploadBill()">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Upload Nota</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <input class="form-control" type="file" id="billFile"
+                                                           name="bill_file">
+                                                    <div class="form-text text-danger">
+                                                        Data nota yang sudah ada akan dihapus dan digantikan dengan
+                                                        data dari hasil upload.
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                        Close
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary">Upload</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="sticky-top bottom-0 top-auto bg-dark pt-1"
@@ -448,9 +484,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/jimp@0.22.12/browser/lib/jimp.js"></script>-->
 <script src="js/utils.js"></script>
-<script src="js/app.js?v=1.1.2"></script>
+<script src="js/app.js?v=1.1.3"></script>
 <script>
   const addModal = document.getElementById('addParticipantModal');
   const myInput = document.getElementById('add_modal_name');
