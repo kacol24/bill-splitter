@@ -333,7 +333,7 @@
                                                     <tfoot>
                                                     <template x-for="(detail, index) in participant.breakdown"
                                                               :key="index">
-                                                        <tr x-show="detail.value > 0 || detail.key == 'Subtotal'">
+                                                        <tr>
                                                             <td class="text-end" colspan="2">
                                                                 <span class="p-0" x-text="detail.key"></span>
                                                             </td>

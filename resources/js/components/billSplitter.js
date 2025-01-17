@@ -59,8 +59,7 @@ export default () => ({
       this.charges.forEach(charge => {
         let extra = participant.sum * charge.percent;
         participant.breakdown.push({
-          'key': `${charge.name} (${Math.round(charge.percent * 1000) /
-          10}%)`,
+          'key': `${charge.name} (${Math.round(charge.percent * 1000) / 10}%)`,
           'value': extra
         });
         participant.sum += extra;
