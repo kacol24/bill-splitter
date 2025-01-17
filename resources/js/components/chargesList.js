@@ -1,5 +1,3 @@
-import Alpine from 'alpinejs';
-
 export default () => ({
   addChargeRow() {
     this.charges.push(
@@ -13,6 +11,6 @@ export default () => ({
   removeChargeRow(index) {
     this.charges.splice(index, 1);
     // this.calculateSum();
-    Alpine.$dispatch('charge-removed');
+    this.$dispatch('charge-removed');
   }
 });

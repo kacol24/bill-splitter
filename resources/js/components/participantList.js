@@ -1,4 +1,3 @@
-import Alpine from 'alpinejs';
 import chunk from 'lodash/chunk';
 import pad from 'lodash/pad';
 
@@ -10,13 +9,7 @@ export default () => ({
       name: this.participant.name,
       sum: 0
     });
-    // let ref = 'participant-' + this.participants.length;
-    // this.$nextTick(() => {
-    //   let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
-    //   inputEl[0].focus();
-    // });
-    // this.calculateSum();
-    Alpine.$dispatch('participant-added');
+    this.$dispatch('participant-added');
     this.participant = {};
   },
   removeParticipantRow(index) {
@@ -36,7 +29,7 @@ export default () => ({
       item.participants.splice(theParticipant, 1);
     });
     // this.calculateSum();
-    Alpine.$dispatch('participant-removed');
+    this.$dispatch('participant-removed');
   },
   clearParticipants() {
     let confirmed = confirm('Clear anggota? Gak bisa di-undo ya');
@@ -49,7 +42,7 @@ export default () => ({
       item.allParticipants = false;
     });
     // this.calculateSum();
-    Alpine.$dispatch('participant-cleared');
+    this.$dispatch('participant-cleared');
   },
   shareBill() {
     let messages = [];

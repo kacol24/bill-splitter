@@ -130,7 +130,7 @@ export default () => ({
     } else {
       this.items[index].participants[participantIndex].qty++;
     }
-    Alpine.$dispatch('qty-changed');
+    this.$dispatch('qty-changed');
   },
   subQty(index) {
     if (this.selectedParticipantIndex == null) {
@@ -157,6 +157,6 @@ export default () => ({
       this.items[index].participants.splice(participantIndex, 1);
     }
 
-    Alpine.$dispatch('qty-changed');
+    this.$dispatch('qty-changed');
   }
 });

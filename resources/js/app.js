@@ -14,5 +14,5 @@ Alpine.data('ParticipantList', participantList);
 Alpine.data('ItemList', itemList);
 Alpine.data('ChargesList', chargesList);
 
-window.Alpine = Alpine;
 Alpine.start();
+window.Alpine = Alpine;

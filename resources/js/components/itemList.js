@@ -1,4 +1,3 @@
-import Alpine from 'alpinejs';
 import map from 'lodash/map';
 
 export default () => ({
@@ -8,11 +7,11 @@ export default () => ({
       participants: []
     });
     let ref = 'item-' + this.items.length;
-    Alpine.$nextTick(() => {
+    this.$nextTick(() => {
       let inputEl = document.querySelectorAll('[x-ref="' + ref + '"]');
       inputEl[0].focus();
     });
-    Alpine.$dispatch('item-added');
+    this.$dispatch('item-added');
   },
   removeItemRow(index) {
     let confirmed = confirm('Remove item? Gak bisa di-undo ya');
@@ -22,7 +21,7 @@ export default () => ({
     this.items.splice(index, 1);
     // this.calculateSum();
     // this.calculateTaxPercent();
-    Alpine.$dispatch('item-removed');
+    this.$dispatch('item-removed');
   },
   toggleParticipants(index, checked) {
     if (checked) {
@@ -31,7 +30,7 @@ export default () => ({
       this.items[index].participants = [];
     }
     // this.calculateSum();
-    Alpine.$dispatch('participant-toggled');
+    this.$dispatch('participant-toggled');
   },
   clearBill() {
     let confirmed = confirm('Clear bill? Gak bisa di-undo ya');
@@ -41,6 +40,6 @@ export default () => ({
     this.items = [];
     this.charges = [];
     // this.calculateSum();
-    Alpine.$dispatch('bill-cleared');
+    this.$dispatch('bill-cleared');
   }
 });
